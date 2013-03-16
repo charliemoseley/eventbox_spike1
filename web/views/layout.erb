@@ -1,0 +1,7 @@
+<h1>Event Box</h1>
+<div id="flash-container" class="fixed-container">
+  <% flash.keys.each do | key | %>
+    <div class="alert alert-<%= key %>"><%= flash[key] %></div>
+  <% end %>
+</div>
+<%= yield %>

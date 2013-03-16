@@ -8,6 +8,7 @@ class EventBoxWeb
   # Sessions
   enable :sessions
   set :session_secret, 'asdfewffdvcebjkhbwecowa32u4rbdasjhfb28fgew8agsfd67832gr'
+  use Rack::Flash, sweep: true
   
   # Omniauth
   use OmniAuth::Builder do
