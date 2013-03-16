@@ -4,6 +4,7 @@ require 'better_errors'
 require 'omniauth'
 require 'rack-flash'
 require_relative 'models/boot'
+require_relative 'eventbox_workers'
 
 class EventBoxWeb < Sinatra::Base
   require_relative 'web/config'
@@ -39,6 +40,10 @@ class EventBoxWeb < Sinatra::Base
   
   get '/dashboard' do
     "Welcome #{current_user.name}!"
+  end
+  
+  get '/message' do
+    Workers::SinatraWorker.perform_async("Hi Sidekiq")
   end
   
   get '/error' do

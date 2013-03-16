@@ -6,6 +6,8 @@ gem 'activerecord'
 gem 'sinatra-activerecord'
 gem 'omniauth-google-oauth2'
 gem 'rack-flash3'
+gem 'sidekiq'
+gem 'slim'
 #gem 'pry'
 
 group :development do
