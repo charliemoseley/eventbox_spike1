@@ -3,6 +3,8 @@ require 'sinatra/activerecord'
 require 'better_errors'
 require 'omniauth'
 require 'rack-flash'
+require 'sinatra/assetpack'
+
 require_relative '../models/boot'
 require_relative '../workers/boot'
 

@@ -1,7 +1,32 @@
-<h1>Event Box</h1>
-<div id="flash-container" class="fixed-container">
+<!DOCTYPE html>
+<!--[if lt IE 7]>  <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>     <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>     <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>eventbox.io</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+  <%= css :application, media: 'screen' %>
+  <%= js  :modernizr %>
+</head>
+
+<body>
+  <h1>Event Box</h1>
+  <div id="flash-container" class="fixed-container">
   <% flash.keys.each do | key | %>
     <div class="alert alert-<%= key %>"><%= flash[key] %></div>
   <% end %>
-</div>
-<%= yield %>
+  </div>
+  
+  <%= yield %>
+  
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <%= js :application %>
+</body>
+</html>

@@ -1,4 +1,19 @@
 class EventBoxWeb
+  set :root, File.dirname(__FILE__)
+  
+  # Assetpack
+  register Sinatra::AssetPack
+  assets do
+    serve '/css', from: 'assets/css'
+    css :application, ['/css/vendor/*.css', '/css/app/*.css']
+    
+    serve '/js', from: 'assets/js'
+    js :application, ['/js/vendor/*', '/js/app/*']
+    js :modernizr,   ['/js/special/modernizr.js']
+    
+    serve '/images', from: 'assets/images'
+  end
+  
   # Better Errors
   configure :development do
     use BetterErrors::Middleware

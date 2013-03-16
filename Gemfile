@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'sinatra'
+gem 'sinatra-assetpack'
 gem 'sqlite3'
 gem 'activerecord'
 gem 'sinatra-activerecord'
