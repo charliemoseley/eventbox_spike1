@@ -1,2 +1,2 @@
 web: bundle exec shotgun
-worker: bundle exec sidekiq -r ./eventbox_workers.rb
+worker: bundle exec sidekiq -r ./workers/boot.rb

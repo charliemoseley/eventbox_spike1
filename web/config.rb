@@ -12,9 +12,9 @@ class EventBoxWeb
   
   # Omniauth
   use OmniAuth::Builder do
-    provider :google_oauth2, ENV['GOOGLE_KEY'], ENV['GOOGLE_SECRET']
+    provider :google_oauth2, ENV['GOOGLE_KEY'], ENV['GOOGLE_SECRET'],
+      scope: 'https://www.google.com/calendar/feeds/,userinfo.email,userinfo.profile',
+      access_type: 'offline',
+      approval_prompt: 'force'
   end
-  
-  # Configure View Directory
-  set :views, Proc.new { File.join(root, 'web/views') }
 end

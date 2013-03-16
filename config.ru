@@ -3,7 +3,7 @@ require 'bundler'
 
 Bundler.require
 
-require './eventbox_web'
+require './web/eventbox_web'
 require 'sidekiq/web'
 
 if ENV['RACK_ENV'] == 'production'

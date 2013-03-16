@@ -3,11 +3,11 @@ require 'sinatra/activerecord'
 require 'better_errors'
 require 'omniauth'
 require 'rack-flash'
-require_relative 'models/boot'
-require_relative 'eventbox_workers'
+require_relative '../models/boot'
+require_relative '../workers/boot'
 
 class EventBoxWeb < Sinatra::Base
-  require_relative 'web/config'
+  require_relative 'config'
   
   helpers do
     def current_user
@@ -43,7 +43,7 @@ class EventBoxWeb < Sinatra::Base
   end
   
   get '/message' do
-    Workers::SinatraWorker.perform_async("Hi Sidekiq")
+    Workers::Message::Test.perform_async("Hi Sidekiq")
   end
   
   get '/error' do
