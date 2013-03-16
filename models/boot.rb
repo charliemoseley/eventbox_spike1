@@ -1,7 +1,10 @@
-require "sinatra"
-require "sinatra/activerecord"
+require 'sqlite3'
+require 'active_record'
 
-set :database, 'sqlite3:///db/eventbox.db'
+ActiveRecord::Base.establish_connection(
+  adapter: 'sqlite3',
+  database: 'db/eventbox.db'
+)
 
 # Load up all the models
 require_relative 'user'

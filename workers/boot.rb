@@ -6,7 +6,7 @@ require 'redis'
 require_relative '../models/boot'
 
 # Load up the workers
-require_relative 'messages/test'
+require_relative 'message/test'
 
 # Set the base class with connection
 class Workers
