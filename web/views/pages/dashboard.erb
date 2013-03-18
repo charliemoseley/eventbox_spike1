@@ -1,0 +1,18 @@
+Welcome <%= current_user.name %>!<br />
+<a class="btn btn-success" href="/auth/meetup">
+  <i class="icon-google-plus-sign icon-large"></i> 
+  Login with Meetup
+</a>
+<hr />
+<table>
+  <tr>
+    <td>Provider</td>
+    <td>UID</td>
+  </tr>
+  <% current_user.accounts.each do |account| %>
+    <tr>
+      <td><%= account.provider %></td>
+      <td><%= account.uid %></td>
+    </tr>
+  <% end %>
+</table>

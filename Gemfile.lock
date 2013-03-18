@@ -50,6 +50,9 @@ GEM
     omniauth-google-oauth2 (0.1.13)
       omniauth (~> 1.0)
       omniauth-oauth2
+    omniauth-meetup (0.0.6)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.0)
     omniauth-oauth2 (1.1.1)
       oauth2 (~> 0.8.0)
       omniauth (~> 1.0)
@@ -113,6 +116,7 @@ DEPENDENCIES
   better_errors
   binding_of_caller
   omniauth-google-oauth2
+  omniauth-meetup
   rack-flash3
   shotgun
   sidekiq

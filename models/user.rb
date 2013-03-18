@@ -22,4 +22,14 @@ class User < ActiveRecord::Base
     
     return user
   end
+  
+  def add_or_update_account(omniauth)
+    ActiveRecord::Base.transaction do
+      account = Account.create_or_update omniauth
+      account.user = self
+      account.save
+    
+      return self
+    end
+  end
 end

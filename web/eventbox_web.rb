@@ -40,8 +40,13 @@ class EventBoxWeb < Sinatra::Base
     redirect '/dashboard'
   end
   
+  get '/auth/meetup/callback' do
+    account = current_user.add_or_update_account request.env["omniauth.auth"]
+    redirect '/dashboard'
+  end
+  
   get '/dashboard' do
-    "Welcome #{current_user.name}!"
+    erb :'pages/dashboard'
   end
   
   get '/message' do

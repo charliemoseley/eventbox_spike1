@@ -31,5 +31,7 @@ class EventBoxWeb
       scope: 'https://www.google.com/calendar/feeds/,userinfo.email,userinfo.profile',
       access_type: 'offline',
       approval_prompt: 'force'
+    
+    provider :meetup, ENV['MEETUP_KEY'], ENV['MEETUP_SECRET']
   end
 end
