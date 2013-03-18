@@ -9,7 +9,7 @@ class Account < ActiveRecord::Base
     account.name          = omniauth.info.name          rescue nil
     account.first_name    = omniauth.info.first_name    rescue nil
     account.last_name     = omniauth.info.last_name     rescue nil
-    account.email         = omniauth.info.email
+    account.email         = omniauth.info.email         rescue nil
     account.image         = omniauth.info.image         rescue nil
     account.token         = omniauth.credentials.token
     account.refresh_token = omniauth.credentials.refresh_token rescue nil
@@ -17,6 +17,11 @@ class Account < ActiveRecord::Base
     account.expires       = omniauth.credentials.expires       rescue nil
     account.raw           = omniauth.to_json
     account.save
+    
+    # Custom Assignments
+    if omniauth.provider == "meetup"
+      account.image = omniauth.info.photo_url
+    end
     
     return account
   end
