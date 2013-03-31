@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../../web/eventbox_web', __FILE__)
+require 'bundler'
+
+Bundler.require(:default, :console)
+
+# include rack helpers to play around with
+include Rack::Test::Methods
+self.instance_eval do
+  @app = EventBoxWeb.new
+  def app; @app; end
+end
+
+# add ability to reload console
+def reload
+  reload_msg = '# Reloading the console...'
+  puts CodeRay.scan(reload_msg, :ruby).term
+  Pry.save_history
+  exec(__FILE__)
+end
+alias :reload! :reload
+
+# start the console! :-)
+system('clear')
+
+welcome = <<eos
+ Eventbox Console
+eos
+
+puts CodeRay.scan(welcome, :ruby).term
+
+Pry.start
