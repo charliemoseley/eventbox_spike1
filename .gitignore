@@ -1,6 +1,7 @@
 # Custom Ignores
 .env
 /db/*.db
+.idea/*
 
 # https://github.com/github/gitignore/blob/master/Global/OSX.gitignore
 .DS_Store

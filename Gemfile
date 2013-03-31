@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+# Sinatra App
 gem 'sinatra'
 gem 'sinatra-assetpack'
 gem 'sqlite3'
@@ -8,9 +9,19 @@ gem 'sinatra-activerecord'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-meetup'
 gem 'rack-flash3'
+
+# Workers
 gem 'sidekiq'
 gem 'slim'
-#gem 'pry'
+
+# For Google Library
+gem 'typhoeus'
+gem 'json'
+gem 'hashie'
+
+# Development Tools
+gem 'pry'
+gem 'coderay'
 
 group :development do
   gem 'shotgun'
