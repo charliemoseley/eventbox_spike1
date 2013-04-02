@@ -19,6 +19,16 @@ module GCalendar
     property :access_role, from: :accessRole
     property :default_reminders, from: :defaultReminders
     
+    def self.find(id, access_token, refresh_token)
+      connection = GConnect::Connection.new
+      result = connection.api "https://www.googleapis.com/calendar/v3/users/me/calendarList/#{id}", 
+        :get, 
+        access_token: access_token,
+        refresh_token: refresh_token
+      
+      Calendar.new(result.body)
+    end
+    
     def self.all(access_token, refresh_token)
       connection = GConnect::Connection.new
       results = connection.api "https://www.googleapis.com/calendar/v3/users/me/calendarList", 
