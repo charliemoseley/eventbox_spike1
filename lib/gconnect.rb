@@ -3,15 +3,20 @@ require 'json'
 require 'hashie'
 
 module GConnect
-  GRANT_TYPE        = "refresh_token"
-  REFRESH_TOKEN_URL = "https://accounts.google.com/o/oauth2/token"
+  GRANT_TYPE        = "refresh_token".freeze
+  REFRESH_TOKEN_URL = "https://accounts.google.com/o/oauth2/token".freeze
   
   class Connection
     attr_reader :client_id, :client_secret
+    attr_accessor :request_made_proc, :access_token_updated_proc
     
-    def initialize(client_id = nil, client_secret = nil)
+    def initialize(client_id = nil, client_secret = nil, params = {})
       @client_id     = client_id     || ENV['GOOGLE_KEY']
       @client_secret = client_secret || ENV['GOOGLE_SECRET']
+      
+      # Pass a proc or lambda to set up callbacks on these actions
+      @request_made_proc         = params[:request_made_proc]
+      @access_token_updated_proc = params[:access_token_updated_proc]
     end
     
     def api(url, method, params = {})
@@ -29,6 +34,7 @@ module GConnect
         case
         when response.success?
           puts "Success"
+          @request_made_proc.call
           return GConnect::Response.new response
         when response.timed_out?
           puts "Timed out.  Is google down?"
@@ -80,7 +86,13 @@ module GConnect
                   body: hash_to_body(post_params)
       
       request.on_complete do |response|
-        return GConnect::Response.new response
+        response_obj = GConnect::Response.new response
+        
+        @request_made_proc.call
+        @access_token_updated_proc.call(response_obj.body.access_token,
+          refresh_token)
+        
+        return response_obj
       end
       
       # Run the request
