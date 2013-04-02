@@ -7,7 +7,7 @@ require 'sinatra/assetpack'
 
 require_relative '../models/boot'
 require_relative '../workers/boot'
-require_relative '../lib/gconnect'
+require_relative '../lib/gcalendar'
 
 class EventBoxWeb < Sinatra::Base
   require_relative 'config'
