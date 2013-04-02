@@ -15,8 +15,8 @@ module GConnect
       @client_secret = client_secret || ENV['GOOGLE_SECRET']
       
       # Pass a proc or lambda to set up callbacks on these actions
-      @request_made_proc         = params[:request_made_proc]
-      @access_token_updated_proc = params[:access_token_updated_proc]
+      @request_made_proc         = params[:request_made_proc] || Proc.new {}
+      @access_token_updated_proc = params[:access_token_updated_proc] || Proc.new {}
     end
     
     def api(url, method, params = {})
