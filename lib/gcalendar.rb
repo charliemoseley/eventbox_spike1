@@ -21,42 +21,52 @@ module GCalendar
       @access_token  = params[:access_token]
       @refresh_token = params[:refresh_token]
       @connection    = GConnect::Connection.new
-      hash.fetched_at = Time.now unless hash.nil?
       
       super(hash)
+      self.fetched_at = Time.now unless hash.nil?
     end
     
     def all_events(params = {})
       url = "https://www.googleapis.com/calendar/v3/calendars/#{self.id}/events"
-      result = @connection.api url, :get, access_token: @access_token,
-                 refresh_token: @refresh_token
+      params = GCalendar::Calendar.camelize_params params
+      params[:access_token]  = @access_token
+      params[:refresh_token] = @refresh_token unless @refresh_token.nil?
       
-      params[:fetched_at] = Time.now
+      result = @connection.api url, :get, params
       result.body.items.map { |event| Event.new(event, params) }
     end
     
     def self.find(id, params = {})
-      @access_token, @refresh_token = params[:access_token], params[:refresh_token]
-      connection = GConnect::Connection.new
-      result = connection.api "https://www.googleapis.com/calendar/v3/users/me/calendarList/#{id}", 
-        :get, 
-        access_token: params[:access_token],
-        refresh_token: params[:refresh_token]
+      url = "https://www.googleapis.com/calendar/v3/users/me/calendarList/#{id}"
+      params = GCalendar::Calendar.camelize_params params
       
-      params[:fetched_at] = Time.now
+      connection = GConnect::Connection.new
+      result = connection.api url, :get, params
       Calendar.new(result.body, params)
     end
     
     def self.all(params = {})
-      @access_token, @refresh_token = params[:access_token], params[:refresh_token]
-      connection = GConnect::Connection.new
-      results = connection.api "https://www.googleapis.com/calendar/v3/users/me/calendarList", 
-        :get, 
-        access_token: params[:access_token],
-        refresh_token: params[:refresh_token]
+      url = "https://www.googleapis.com/calendar/v3/users/me/calendarList"
+      params = GCalendar::Calendar.camelize_params params
       
-      params[:fetched_at] = Time.now
+      connection = GConnect::Connection.new
+      results = connection.api url, :get, params
       results.body.items.map { |calendar| Calendar.new(calendar, params) }
+    end
+    
+    private
+    
+    def self.camelize_params(params)
+      access_token  = params.delete(:access_token)
+      refresh_token = params.delete(:refresh_token)
+      
+      params = params.inject({}) do |memo, (k, v)| 
+        memo[k.to_s.camelize(:lower).to_sym] = v
+        memo
+      end
+      params[:access_token]  = access_token unless access_token.nil?
+      params[:refresh_token] = refresh_token unless refresh_token.nil?
+      params
     end
   end
   
@@ -82,9 +92,9 @@ module GCalendar
       @access_token  = params[:access_token]
       @refresh_token = params[:refresh_token]
       @connection    = GConnect::Connection.new
-      hash.fetched_at = Time.now unless hash.nil?
       
       super(hash)
+      self.fetched_at = Time.now unless hash.nil?
     end
   end
 end

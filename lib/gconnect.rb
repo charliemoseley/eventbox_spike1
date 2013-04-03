@@ -20,15 +20,16 @@ module GConnect
     end
     
     def api(url, method, params = {})
-      typhoeus_options = {
-        client_id:     @client_id,
-        client_secret: @client_secret,
-        access_token:  params[:access_token]
-      }
+      params[:client_id]     = @client_id
+      params[:client_secret] = @client_secret
+      refresh_token = params.delete(:refresh_token)
+      # These are used for manual overrides of the params syntactic sugar if 
+      # needed.
+      # [ADD CODE]
       
       request = Typhoeus::Request.new url,
-                  method: :get,
-                  params: typhoeus_options
+                  method: method,
+                  params: params
       
       request.on_complete do |response|
         case
@@ -46,8 +47,10 @@ module GConnect
           # how to distinguish between those two requests and properly get a new
           # token or just throw an error.
           puts "In refresh block"
-          if params[:refresh_token]
-            new_auth = fetch_new_access_token(params[:refresh_token])
+          if refresh_token
+            new_auth = fetch_new_access_token(refresh_token)
+            # Due to not passing the refresh token in again, we limit this to one
+            # retry.
             params[:access_token] = new_auth.body.access_token
             return api(url, method, params)
           else
