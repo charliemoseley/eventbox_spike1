@@ -2,57 +2,54 @@ require 'typhoeus'
 require 'json'
 require 'hashie'
 
-module GConnect
+class GConnect
   GRANT_TYPE        = "refresh_token".freeze
   REFRESH_TOKEN_URL = "https://accounts.google.com/o/oauth2/token".freeze
   
   class Connection
-    attr_reader :client_id, :client_secret
-    attr_accessor :request_made_proc, :access_token_updated_proc
+    attr_reader   :client_id, :client_secret
+    attr_accessor :callback_request_made, :callback_access_token_refreshed,
+                  :hydra
     
-    def initialize(client_id = nil, client_secret = nil, params = {})
-      @client_id     = client_id     || ENV['GOOGLE_KEY']
-      @client_secret = client_secret || ENV['GOOGLE_SECRET']
+    def initialize(options = {})
+      @client        = options[:client_id]     || ENV['GOOGLE_KEY']
+      @client_secret = options[:client_secret] || ENV['GOOGLE_SECRET']
+      @hydra         = Typhoeus::Hydra.new
       
-      # Pass a proc or lambda to set up callbacks on these actions
-      @request_made_proc         = params[:request_made_proc] || Proc.new {}
-      @access_token_updated_proc = params[:access_token_updated_proc] || Proc.new {}
+      @callback_request_made          = Proc.new {}
+      @callback_access_token_refreshed = Proc.new {}
     end
     
-    def api(url, method, params = {})
-      params[:client_id]     = @client_id
-      params[:client_secret] = @client_secret
-      refresh_token = params.delete(:refresh_token)
-      # These are used for manual overrides of the params syntactic sugar if 
-      # needed.
-      # [ADD CODE]
+    # This method is still ugly and could use some cleanup.
+    def api(method, url, options = {})
+      unless [:get, :delete, :post, :put, :patch].include? method
+        raise "Unknown REST method: #{method}"
+      end
       
-      request = Typhoeus::Request.new url,
-                  method: method,
-                  params: params
+      config = RequestConfig.new
+      config.method = method
+      config.access_token   = options[:access_token]
+      config.request_params = options[:request_params]
+      config.request_body   = options[:request_body]
+      refresh_token         = options[:refresh_token]
       
+      request = Typhoeus::Request.new url, config.finalize
       request.on_complete do |response|
         case
         when response.success?
           puts "Success"
-          @request_made_proc.call
+          @callback_request_made.call
           return GConnect::Response.new response
         when response.timed_out?
           puts "Timed out.  Is google down?"
           return response
         when response.code == 401
-          # TODO: There is two situations when this occurs.  When we need a new
-          # auth token and when we just don't send out the right credentials for
-          # anything (ex: don't send any auth tokens or client_ids).  Figure out
-          # how to distinguish between those two requests and properly get a new
-          # token or just throw an error.
           puts "In refresh block"
-          if refresh_token
-            new_auth = fetch_new_access_token(refresh_token)
-            # Due to not passing the refresh token in again, we limit this to one
-            # retry.
-            params[:access_token] = new_auth.body.access_token
-            return api(url, method, params)
+          if refresh_token && @client && @client_secret
+            new_access_token = fetch_new_access_token(refresh_token)
+            options.delete(:refresh_token)
+            options[:access_token] = new_access_token
+            return api(method, url, options)
           else
             return response
           end
@@ -65,53 +62,91 @@ module GConnect
         end
       end
       
-      hydra = Typhoeus::Hydra.new
-      hydra.queue(request)
-      hydra.run
+      @hydra.queue(request)
+      @hydra.run
       
       request
     end
     
     def fetch_new_access_token(refresh_token)
-      puts "Fetch new access token"
-      
-      # Builds the params for getting a new access token
-      post_params = {
-        client_id:     @client_id,
-        client_secret: @client_secret,
-        refresh_token: refresh_token,
-        grant_type:    GRANT_TYPE
-      }
-      
-      # Prep the request
-      request = Typhoeus::Request.new REFRESH_TOKEN_URL,
-                  method: :post,
-                  body: hash_to_body(post_params)
-      
-      request.on_complete do |response|
-        response_obj = GConnect::Response.new response
-        
-        @request_made_proc.call
-        @access_token_updated_proc.call(response_obj.body.access_token,
-          refresh_token)
-        
-        return response_obj
-      end
-      
-      # Run the request
-      hydra = Typhoeus::Hydra.new
-      hydra.queue(request)
-      hydra.run
-      
-      response
+      response = api :post, REFRESH_TOKEN_URL,
+                     request_body: {
+                       refresh_token: refresh_token,
+                       grant_type:    GRANT_TYPE,
+                       client_id:     @client,
+                       client_secret: @client_secret
+                     }
+      @callback_access_token_refreshed.call response, refresh_token
+      return response.body.access_token
     end
     
+    def register_callback(callback, method)
+      if callback == :request_made
+        @callback_request_made = method
+      elsif callback == :access_token_refreshed
+        @callback_access_token_refreshed = method
+      end
+      method
+    end
+  end
+  
+  class RequestConfig < Hashie::Mash
+    def access_token=(access_token)
+      return self if access_token.nil?
+      self.headers = {} if self.headers.nil?
+      
+      self.headers.Authorization = "Bearer #{access_token}"
+      self
+    end
+    
+    def request_params=(hash)
+      return self if hash.nil?
+      self.params = {} if self.params.nil?
+      
+      hash.each do |key, value|
+        self.params[camelize_key(key)] = value
+      end
+      self
+    end
+    
+    def request_body=(hash)
+      return self if hash.nil?
+      self._body = {} if self._body.nil?
+      
+      hash.each do |key, value|
+        self._body[camelize_key(key)] = value
+      end
+      self
+    end
+    
+    def finalize
+      if self._body
+        self.body = hash_to_body(self._body)
+        self.delete(:_body)
+      end
+      symbolize_hash_keys self.to_hash
+    end
+      
     private
+    
+    def camelize_key(sym)
+      return sym if protected_symbol(sym)
+      sym.to_s.camelize(:lower).to_sym
+    end
+    
+    def protected_symbol(sym)
+      p = [:grant_type, :access_token, :refresh_token, :client_id, :client_secret]
+      return true if p.include? sym
+    end
     
     def hash_to_body(hash)
       hash.map do |key, value|
         "#{key}=#{value}"
       end.join('&')
+    end
+    
+    def symbolize_hash_keys(hash)
+      hash.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     end
   end
   
