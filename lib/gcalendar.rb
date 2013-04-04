@@ -17,56 +17,70 @@ module GCalendar
     attr_accessor :access_token, :refresh_token
     attr_reader   :connection
     
-    def initialize(hash = nil, params = {})
-      @access_token  = params[:access_token]
-      @refresh_token = params[:refresh_token]
+    def initialize(hash = nil, options = {})
+      @access_token  = options[:access_token]
+      @refresh_token = options[:refresh_token]
       @connection    = GConnect::Connection.new
       
       super(hash)
       self.fetched_at = Time.now unless hash.nil?
     end
     
-    def all_events(params = {})
+    def all_events(options = {})
       url = "https://www.googleapis.com/calendar/v3/calendars/#{self.id}/events"
-      params = GCalendar::Calendar.camelize_params params
-      params[:access_token]  = @access_token
-      params[:refresh_token] = @refresh_token unless @refresh_token.nil?
+      access_token  = options.delete(:access_token)  || @access_token
+      refresh_token = options.delete(:refresh_token) || @refresh_token
       
-      result = @connection.api url, :get, params
-      result.body.items.map { |event| Event.new(event, params) }
-    end
-    
-    def self.find(id, params = {})
-      url = "https://www.googleapis.com/calendar/v3/users/me/calendarList/#{id}"
-      params = GCalendar::Calendar.camelize_params params
+      request_options = {
+        access_token:   access_token,
+        refresh_token:  refresh_token,
+        request_params: options
+      }
       
-      connection = GConnect::Connection.new
-      result = connection.api url, :get, params
-      Calendar.new(result.body, params)
-    end
-    
-    def self.all(params = {})
-      url = "https://www.googleapis.com/calendar/v3/users/me/calendarList"
-      params = GCalendar::Calendar.camelize_params params
+      response   = @connection.api :get, url, request_options
       
-      connection = GConnect::Connection.new
-      results = connection.api url, :get, params
-      results.body.items.map { |calendar| Calendar.new(calendar, params) }
-    end
-    
-    private
-    
-    def self.camelize_params(params)
-      access_token  = params.delete(:access_token)
-      refresh_token = params.delete(:refresh_token)
-      
-      params = params.inject({}) do |memo, (k, v)| 
-        memo[k.to_s.camelize(:lower).to_sym] = v
-        memo
+      response.body.items.map do |event| 
+        Event.new event, access_token:  access_token,
+                         refresh_token: refresh_token
       end
-      params[:access_token]  = access_token unless access_token.nil?
-      params[:refresh_token] = refresh_token unless refresh_token.nil?
-      params
+    end
+    
+    def self.find(id, options = {})
+      url = "https://www.googleapis.com/calendar/v3/users/me/calendarList/#{id}"
+      access_token  = options.delete(:access_token)
+      refresh_token = options.delete(:refresh_token)
+      
+      request_options = {
+        access_token:   access_token,
+        refresh_token:  refresh_token,
+        request_params: options
+      }
+      
+      connection = GConnect::Connection.new
+      response   = connection.api :get, url, request_options
+      
+      Calendar.new response.body, access_token:  access_token,
+                                  refresh_token: refresh_token
+    end
+    
+    def self.all(options = {})
+      url = "https://www.googleapis.com/calendar/v3/users/me/calendarList"
+      access_token  = options.delete(:access_token)
+      refresh_token = options.delete(:refresh_token)
+      
+      request_options = {
+        access_token:   access_token,
+        refresh_token:  refresh_token,
+        request_params: options
+      }
+      
+      connection = GConnect::Connection.new
+      response   = connection.api :get, url, request_options
+      
+      response.body.items.map do |calendar|
+        Calendar.new calendar, access_token:  access_token,
+                               refresh_token: refresh_token
+      end
     end
   end
   
@@ -88,9 +102,9 @@ module GCalendar
     attr_accessor :access_token, :refresh_token
     attr_reader   :connection
     
-    def initialize(hash, params = {})
-      @access_token  = params[:access_token]
-      @refresh_token = params[:refresh_token]
+    def initialize(hash = nil, options = {})
+      @access_token  = options[:access_token]
+      @refresh_token = options[:refresh_token]
       @connection    = GConnect::Connection.new
       
       super(hash)
