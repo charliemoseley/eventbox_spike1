@@ -40,10 +40,11 @@ module GCalendar
         request_params: options
       }
       
-      response   = @connection.api :get, url, request_options
+      response = @connection.api :get, url, request_options
       return response if response.kind_of? GConnect::Error
       
-      response.body.items.map do |event| 
+      response.body.items.map do |event|
+        event.calendar_id = self.id
         Event.new event, access_token:  access_token,
                          refresh_token: refresh_token
       end
@@ -174,18 +175,43 @@ module GCalendar
     property :guests_can_see_other_guests, from: :guestsCanSeeOtherGuests
     property :guests_can_invite_others, from: :guestsCanInviteOthers
     property :private_copy, from: :privateCopy
-    property :fetched_at # non-google
+    # non-google
+    property :fetched_at
+    property :calendar_id
     
     attr_accessor :access_token, :refresh_token
     attr_reader   :connection
     
-    def initialize(hash = nil, options = {})
+    def initialize(options = {})
       @access_token  = options[:access_token]
       @refresh_token = options[:refresh_token]
       @connection    = GConnect::Connection.new
       
-      super(hash)
+      super(options[:initialize_with])
       self.fetched_at = Time.now unless hash.nil?
+    end
+    
+    def self.find(calendar_id, event_id, options = {})
+      url = "https://www.googleapis.com/calendar/v3/calendars/#{calendar_id}/events/#{event_id}"
+      access_token  = options.delete(:access_token)
+      refresh_token = options.delete(:refresh_token)
+      
+      request_options = {
+        access_token:   access_token,
+        refresh_token:  refresh_token,
+        request_params: options
+      }
+      
+      connection = GConnect::Connection.new
+      response   = connection.api :get, url, request_options
+      return response if response.kind_of? GConnect::Error
+      
+      # Save the calendar id to the response so it can be rendered into the new
+      # object.
+      response.body.calendar_id = calendar_id
+      Event.new initialize_with: response.body,
+                access_token:    access_token,
+                refresh_token:   refresh_token
     end
   end
 end
