@@ -65,6 +65,7 @@ class GConnect
       end
       
       @hydra.queue(request)
+      @hydra.run
       
       request
     end
