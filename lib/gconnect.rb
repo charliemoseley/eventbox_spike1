@@ -31,6 +31,8 @@ class GConnect
       config.access_token   = options[:access_token]
       config.request_params = options[:request_params]
       config.request_body   = options[:request_body]
+      config.content_type   = "application/json" unless url == REFRESH_TOKEN_URL
+      config.form_encoding  = true if url == REFRESH_TOKEN_URL
       refresh_token         = options[:refresh_token]
       
       request = Typhoeus::Request.new url, config.finalize
@@ -42,7 +44,7 @@ class GConnect
           return GConnect::Response.new response
         when response.timed_out?
           puts "Timed out.  Is google down?"
-          return response
+          return GConnect::Error.new response
         when response.code == 401
           puts "In refresh block"
           if refresh_token && @client && @client_secret
@@ -51,19 +53,18 @@ class GConnect
             options[:access_token] = new_access_token
             return api(method, url, options)
           else
-            return response
+            return GConnect::Error.new response
           end
         when response.code == 0
           puts"Could not get an http response, something's wrong."
-          return response
+          return GConnect::Error.new response
         else
           puts "HTTP request failed: #{response.code}"
-          return response
+          return GConnect::Error.new response
         end
       end
       
       @hydra.queue(request)
-      @hydra.run
       
       request
     end
@@ -91,6 +92,15 @@ class GConnect
   end
   
   class RequestConfig < Hashie::Mash
+    attr_accessor :form_encoding
+    
+    def content_type=(content_type)
+      return self if content_type.nil?
+      self.headers = {} if self.headers.nil?
+      
+      self.headers[:'Content-Type'] = content_type
+    end
+    
     def access_token=(access_token)
       return self if access_token.nil?
       self.headers = {} if self.headers.nil?
@@ -111,18 +121,21 @@ class GConnect
     
     def request_body=(hash)
       return self if hash.nil?
-      self._body = {} if self._body.nil?
+      self.body = {} if self.body.nil?
       
       hash.each do |key, value|
-        self._body[camelize_key(key)] = value
+        self.body[camelize_key(key.to_sym)] = value
       end
       self
     end
     
     def finalize
-      if self._body
-        self.body = hash_to_body(self._body)
-        self.delete(:_body)
+      if self.body
+        if @form_encoding
+          self.body = hash_to_body(self.body)
+        else
+          self.body = self.body.to_json
+        end
       end
       symbolize_hash_keys self.to_hash
     end
@@ -151,10 +164,24 @@ class GConnect
   end
   
   class Response
-    attr_reader :body
+    attr_reader :body, :code
     
-    def initialize(typhoeus_response)
-      @body = Hashie::Mash.new JSON.parse(typhoeus_response.body) 
+    def initialize(response)
+      @code = response.code
+      @body = Hashie::Mash.new JSON.parse(response.body)
+    end
+  end
+  
+  class Error
+    attr_reader :body, :code
+    
+    def initialize(response)
+      @code = response.code
+      begin
+        @body = Hashie::Mash.new JSON.parse(response.body)
+      rescue
+        @body = response.body
+      end
     end
   end
 end
