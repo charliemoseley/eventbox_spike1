@@ -19,6 +19,9 @@ gem 'typhoeus'
 gem 'json'
 gem 'hashie'
 
+# Architectural
+gem 'foreman' 
+
 # Development Tools
 gem 'pry'
 gem 'coderay'
