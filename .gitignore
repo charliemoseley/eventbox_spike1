@@ -2,6 +2,7 @@
 .env
 /db/*.db
 .idea/*
+.ruby-version
 
 # https://github.com/github/gitignore/blob/master/Global/OSX.gitignore
 .DS_Store
