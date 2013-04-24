@@ -136,6 +136,10 @@ class GConnect
           self.body = hash_to_body(self.body)
         else
           self.body = self.body.to_json
+          puts "*" * 88
+          puts "Finalized:"
+          puts self.body.inspect
+          puts "*" * 88
         end
       end
       symbolize_hash_keys self.to_hash
@@ -159,8 +163,20 @@ class GConnect
       end.join('&')
     end
     
-    def symbolize_hash_keys(hash)
-      hash.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+    # def symbolize_hash_keys(hash)
+    #   hash.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+    # end
+    
+    def symbolize_hash_keys(value)
+      case value
+        when Array
+          value.map { |v| symbolize_hash_keys(v) }
+          # or `value.map(&method(:convert_hash_keys))`
+        when Hash
+          Hash[value.map { |k, v| [camelize_key(k), symbolize_hash_keys(v)] }]
+        else
+          value
+       end
     end
   end
   
