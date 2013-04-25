@@ -50,6 +50,9 @@ class EventBoxWeb < Sinatra::Base
   get '/dashboard' do
     erb :'pages/dashboard'
   end
+
+  get '/test' do
+  end
   
   get '/message' do
     Workers::Message::Test.perform_async("Hi Sidekiq")
