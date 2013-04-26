@@ -2,19 +2,41 @@ require 'typhoeus'
 require 'json'
 require 'hashie'
 
-class Echidna
-  GRANT_TYPE        = "refresh_token".freeze
-  REFRESH_TOKEN_URL = "https://secure.meetup.com/oauth2/access".freeze
-  
+module Echidna 
+  def self.configure
+    yield Config
+  end
+
+  module Config
+    extend self
+
+    # Sets up the url to make a refresh token request too.
+    attr_accessor :refresh_token_url
+
+    # This will probably never change; but in cases
+    def grant_type
+      "refresh_token"
+    end
+
+    # Used to set the oauth auth hearder to either Bearer or bearer
+    attr_writer :authorization_bearer
+    def authorization_bearer
+      @authorization_bearer || "Bearer"
+    end
+
+    # Your Oauth2 app key and secret
+    attr_accessor :client_id, :client_secret
+  end
+
   class Connection
     attr_reader   :client_id, :client_secret, :refresh_token_url
     attr_accessor :callback_request_made, :callback_access_token_refreshed,
                   :hydra
     
     def initialize(options = {})
-      @client            = options[:client_id]
-      @client_secret     = options[:client_secret]
-      @refresh_token_url = options[:refresh_token_url] || REFRESH_TOKEN_URL
+      @client            = options[:client_id] || Echidna::Config.client_id
+      @client_secret     = options[:client_secret] || Echidna::Config.client_secret
+      @refresh_token_url = options[:refresh_token_url] || Echidna::Config.refresh_token_url
       @hydra             = Typhoeus::Hydra.new
       
       @callback_request_made           = Proc.new {}
@@ -79,7 +101,7 @@ class Echidna
       response = api :post, @refresh_token_url,
                      request_body: {
                        refresh_token: refresh_token,
-                       grant_type:    GRANT_TYPE,
+                       grant_type:    Echidna::Config.grant_type,
                        client_id:     @client,
                        client_secret: @client_secret
                      }
@@ -111,7 +133,7 @@ class Echidna
       return self if access_token.nil?
       self.headers = {} if self.headers.nil?
       
-      self.headers.Authorization = "bearer #{access_token}"
+      self.headers.Authorization = "#{Echidna::Config.authorization_bearer} #{access_token}"
       self
     end
     
