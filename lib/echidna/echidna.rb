@@ -76,7 +76,10 @@ module Echidna
       user_uid              = options[:user_uid]
 
       puts "*" * 88
-      puts config.finalize.to_hash.inspect
+      puts url.to_s
+      puts method.to_s
+      configp = config.dup
+      puts configp.finalize.to_hash.inspect
       puts "*" * 88
       
       request = Typhoeus::Request.new url, config.finalize
@@ -211,7 +214,11 @@ module Echidna
     
     def initialize(response)
       @code = response.code
-      @body = Hashie::Mash.new JSON.parse(response.body)
+      if response.body
+        @body = Hashie::Mash.new JSON.parse(response.body)
+      else
+        @body = ""
+      end
     end
   end
   
