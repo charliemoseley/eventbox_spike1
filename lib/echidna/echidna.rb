@@ -41,9 +41,10 @@ module Echidna
       # Go through the configuration chain and set all the properties for this
       # connection
       @provider          = options[:provider] || Echidna::Config.provider
-      @client            = options[:client_id] || Echidna::Config.client_id
-      @client_secret     = options[:client_secret] || Echidna::Config.client_secret
       @refresh_token_url = options[:refresh_token_url] || Echidna::Config.refresh_token_url
+      @client_id         = options[:client_id] || Echidna::Config.client_id
+      @client_secret     = options[:client_secret] || Echidna::Config.client_secret
+      
       
       @callback_request_made = \
         options[:callback_request_made] ||
@@ -90,7 +91,7 @@ module Echidna
           return Echidna::Error.new response
         when response.code == 401
           puts "In refresh block"
-          if refresh_token && @client && @client_secret
+          if refresh_token && @client_id && @client_secret
             new_access_token = fetch_new_access_token(user_uid, refresh_token)
             options.delete(:refresh_token)
             options[:access_token] = new_access_token
@@ -118,7 +119,7 @@ module Echidna
                      request_body: {
                        refresh_token: refresh_token,
                        grant_type:    Echidna::Config.grant_type,
-                       client_id:     @client,
+                       client_id:     @client_id,
                        client_secret: @client_secret
                      }
       @callback_token_refreshed.call(provider, user_uid, response.body)
