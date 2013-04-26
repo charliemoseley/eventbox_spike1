@@ -24,23 +24,38 @@ module Echidna
       @authorization_bearer || "Bearer"
     end
 
-    # Your Oauth2 app key and secret
-    attr_accessor :client_id, :client_secret
+    # Your Oauth2 app key and secret and provider string
+    attr_accessor :provider, :client_id, :client_secret
+
+    # The two callbacks to fire when a request is made and when an new Oauth token
+    # is issued.
+    attr_accessor :callback_request_made, :callback_token_refreshed
   end
 
   class Connection
-    attr_reader   :client_id, :client_secret, :refresh_token_url
-    attr_accessor :callback_request_made, :callback_access_token_refreshed,
+    attr_reader   :client_id, :client_secret, :refresh_token_url, :provider
+    attr_accessor :callback_request_made, :callback_token_refreshed, 
                   :hydra
     
     def initialize(options = {})
+      # Go through the configuration chain and set all the properties for this
+      # connection
+      @provider          = options[:provider] || Echidna::Config.provider
       @client            = options[:client_id] || Echidna::Config.client_id
       @client_secret     = options[:client_secret] || Echidna::Config.client_secret
       @refresh_token_url = options[:refresh_token_url] || Echidna::Config.refresh_token_url
-      @hydra             = Typhoeus::Hydra.new
       
-      @callback_request_made           = Proc.new {}
-      @callback_access_token_refreshed = Proc.new {}
+      @callback_request_made = \
+        options[:callback_request_made] ||
+        Echidna::Config.callback_request_made ||
+        Proc.new {}
+      @callback_token_refreshed = \
+        options[:callback_token_refreshed] ||
+        Echidna::Config.callback_token_refreshed ||
+        Proc.new {}
+
+      # Sets up Hydra pool to use with this request
+      @hydra = Typhoeus::Hydra.new
     end
     
     # This method is still ugly and could use some cleanup.
@@ -57,6 +72,7 @@ module Echidna
       config.content_type   = "application/json" unless url == @refresh_token_url
       config.form_encoding  = true if url == @refresh_token_url
       refresh_token         = options[:refresh_token]
+      user_uid              = options[:user_uid]
 
       puts "*" * 88
       puts config.finalize.to_hash.inspect
@@ -75,7 +91,7 @@ module Echidna
         when response.code == 401
           puts "In refresh block"
           if refresh_token && @client && @client_secret
-            new_access_token = fetch_new_access_token(refresh_token)
+            new_access_token = fetch_new_access_token(user_uid, refresh_token)
             options.delete(:refresh_token)
             options[:access_token] = new_access_token
             return api(method, url, options)
@@ -97,7 +113,7 @@ module Echidna
       request
     end
     
-    def fetch_new_access_token(refresh_token)
+    def fetch_new_access_token(user_uid, refresh_token)
       response = api :post, @refresh_token_url,
                      request_body: {
                        refresh_token: refresh_token,
@@ -105,15 +121,15 @@ module Echidna
                        client_id:     @client,
                        client_secret: @client_secret
                      }
-      @callback_access_token_refreshed.call response, refresh_token
+      @callback_token_refreshed.call(provider, user_uid, response.body)
       return response.body.access_token
     end
     
     def register_callback(callback, method)
       if callback == :request_made
         @callback_request_made = method
-      elsif callback == :access_token_refreshed
-        @callback_access_token_refreshed = method
+      elsif callback == :token_refreshed
+        @callback_token_refreshed = method
       end
       method
     end
