@@ -79,10 +79,10 @@ module Echidna
       puts url.to_s
       puts method.to_s
       configp = config.dup
-      puts configp.finalize.to_hash.inspect
+      puts configp.finalize!.to_hash.inspect
       puts "*" * 88
       
-      request = Typhoeus::Request.new url, config.finalize
+      request = Typhoeus::Request.new url, config.finalize!
       request.on_complete do |response|
         case
         when response.success?
@@ -177,7 +177,7 @@ module Echidna
       self
     end
     
-    def finalize
+    def finalize!
       if self.body
         if @form_encoding
           self.body = hash_to_body(self.body)
