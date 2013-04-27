@@ -1,10 +1,13 @@
 source 'https://rubygems.org'
-ruby "1.9.3", engine: "rbx", engine_version: "2.0.0.rc1"
+ruby '1.9.3', engine: 'rbx', engine_version: '2.0.0.rc1'
+
+# Architectural
+gem 'foreman'
+gem 'puma', '~> 2.0.0.b6'
 
 # Sinatra App
 gem 'sinatra'
 gem 'sinatra-assetpack'
-gem 'sqlite3'
 gem 'activerecord'
 gem 'sinatra-activerecord'
 gem 'omniauth-google-oauth2'
@@ -20,17 +23,16 @@ gem 'typhoeus'
 gem 'json'
 gem 'hashie'
 
-gem "puma", "~> 2.0.0.b6"
-
-# Architectural
-gem 'foreman' 
-
 # Development Tools
 gem 'pry'
-gem 'coderay'
+
+group :production do
+  gem 'pg'
+end
 
 group :development do
-  gem 'tux'
+  gem 'coderay'
+  gem 'sqlite3'
   gem 'better_errors'
   gem 'binding_of_caller'
 end
