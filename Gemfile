@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+ruby "1.9.3", engine: "rbx", engine_version: "2.0.0.rc1"
 
 # Sinatra App
 gem 'sinatra'
@@ -19,7 +20,7 @@ gem 'typhoeus'
 gem 'json'
 gem 'hashie'
 
-gem 'puma'
+gem "puma", "~> 2.0.0.b6"
 
 # Architectural
 gem 'foreman' 

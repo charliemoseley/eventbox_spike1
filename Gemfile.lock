@@ -71,8 +71,8 @@ GEM
       coderay (~> 1.0.5)
       method_source (~> 0.8)
       slop (~> 3.4)
-    puma (1.6.3)
-      rack (~> 1.2)
+    puma (2.0.0.b7)
+      rack (>= 1.1, < 2.0)
     rack (1.5.2)
     rack-flash3 (1.0.3)
       rack
@@ -142,7 +142,7 @@ DEPENDENCIES
   omniauth-google-oauth2
   omniauth-meetup
   pry
-  puma
+  puma (~> 2.0.0.b6)
   rack-flash3
   sidekiq
   sinatra
