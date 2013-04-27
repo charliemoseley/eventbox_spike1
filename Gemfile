@@ -8,6 +8,7 @@ gem 'puma', '~> 2.0.0.b7'
 # Sinatra App
 gem 'sinatra'
 gem 'sinatra-assetpack'
+gem 'pg'
 gem 'activerecord'
 gem 'sinatra-activerecord'
 gem 'omniauth-google-oauth2'
@@ -26,11 +27,6 @@ gem 'hashie'
 # Development Tools
 gem 'pry'
 
-group :production do
-  gem 'pg'
-end
-
 group :development do
   gem 'coderay'
-  gem 'sqlite3'
 end
