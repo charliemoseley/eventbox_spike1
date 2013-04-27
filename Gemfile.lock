@@ -130,7 +130,7 @@ DEPENDENCIES
   omniauth-meetup
   pg
   pry
-  puma (~> 2.0.0.b6)
+  puma (~> 2.0.0.b7)
   rack-flash3
   sidekiq
   sinatra
