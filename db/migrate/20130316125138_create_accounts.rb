@@ -19,5 +19,6 @@ class CreateAccounts < ActiveRecord::Migration
     end
     
     add_index :accounts, [:provider, :uid], unique: true
+    add_index :accounts, :refresh_token
   end
 end

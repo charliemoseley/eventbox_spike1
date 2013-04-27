@@ -1,5 +1,6 @@
 class Account < ActiveRecord::Base
   belongs_to :user
+  has_many   :calendars
     
   def self.create_or_update(omniauth)
     account = Account.find_by_provider_and_uid(omniauth.provider, omniauth.uid) ||

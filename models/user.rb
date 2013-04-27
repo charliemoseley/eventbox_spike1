@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
   has_many :accounts
+  has_many :calendars
   
   def self.login(omniauth)
     ActiveRecord::Base.transaction do

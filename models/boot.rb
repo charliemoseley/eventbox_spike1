@@ -9,3 +9,4 @@ ActiveRecord::Base.establish_connection(
 # Load up all the models
 require_relative 'user'
 require_relative 'account'
+require_relative 'calendar'
