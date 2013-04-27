@@ -140,6 +140,7 @@ module GCalendar
     end
     
     def self.find(id, options = {})
+      raise "Id is requred" if id.nil?
       url = "https://www.googleapis.com/calendar/v3/users/me/calendarList/#{id}"
       user_uid      = options.delete(:user_uid)
       access_token  = options.delete(:access_token)
