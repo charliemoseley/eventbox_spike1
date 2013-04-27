@@ -4,6 +4,8 @@
 class Workers
   class GCal
     class CreateUpcomingCalendar
+      include Sidekiq::Worker
+      
       def perform(account_id)
         account = Account.includes(:user).find(account_id)
 
