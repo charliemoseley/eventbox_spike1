@@ -19,6 +19,8 @@ gem 'typhoeus'
 gem 'json'
 gem 'hashie'
 
+gem 'puma'
+
 # Architectural
 gem 'foreman' 
 
@@ -27,7 +29,6 @@ gem 'pry'
 gem 'coderay'
 
 group :development do
-  gem 'shotgun'
   gem 'tux'
   gem 'better_errors'
   gem 'binding_of_caller'
