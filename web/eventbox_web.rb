@@ -1,6 +1,5 @@
 require 'sinatra/base'
 require 'sinatra/activerecord'
-require 'better_errors'
 require 'omniauth'
 require 'rack-flash'
 require 'sinatra/assetpack'
