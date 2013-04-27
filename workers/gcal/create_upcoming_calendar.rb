@@ -1,8 +1,8 @@
 # This worker checks whether or not EventBox's upcoming calendar exists or
 # not and appriopately handles the situation.
 
-class Workers
-  class GCal
+module Worker
+  module GCal
     class CreateUpcomingCalendar
       include Sidekiq::Worker
       

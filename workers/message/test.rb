@@ -1,5 +1,5 @@
-class Workers
-  class Message
+module Worker
+  module Message
     class Test
       include Sidekiq::Worker
 

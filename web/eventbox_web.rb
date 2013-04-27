@@ -20,7 +20,7 @@ class EventBoxWeb < Sinatra::Base
   end
   
   before do
-    pass if %w[auth error logout].include? request.path_info.split('/')[1]
+    pass if %w[auth error logout message].include? request.path_info.split('/')[1]
     pass if request.path_info == '/'
     
     unless current_user
@@ -38,6 +38,10 @@ class EventBoxWeb < Sinatra::Base
     
     redirect '/error' if user.nil?
     
+    # Shoot of the worker to check/create our calendar on login
+    account = user.accounts.select{ |a| a.provider = "google_oauth2" }.first
+    Worker::GCal::CreateUpcomingCalendar.perform_async(account.id)
+
     session[:user_id] = user.id
     redirect '/dashboard'
   end
@@ -55,7 +59,7 @@ class EventBoxWeb < Sinatra::Base
   end
   
   get '/message' do
-    Workers::Message::Test.perform_async("Hi Sidekiq")
+    Worker::Message::Test.perform_async("Hi Sidekiq")
   end
   
   get '/error' do

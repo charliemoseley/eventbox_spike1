@@ -24,6 +24,6 @@ GCalendar::Config.callback_token_refreshed = ->(provider, user_uid, response) do
 end
 
 # Set the base class with connection
-class Workers
+module Worker
   $redis = Redis.connect
 end
