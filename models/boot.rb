@@ -2,10 +2,10 @@ require 'active_record'
 require 'uri'
 
 unless ['production', 'staging'].include? ENV['RACK_ENV']
-  ActiveRecord::Base.establish_connection(
-    adapter: 'sqlite3',
-    database: 'db/eventbox.db'
-  )
+  # ActiveRecord::Base.establish_connection(
+  #   adapter: 'sqlite3',
+  #   database: 'db/eventbox.db'
+  # )
 else # Prod and Staging
   db = URI.parse ENV['DATABASE_URL']
 
