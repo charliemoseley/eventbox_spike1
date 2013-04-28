@@ -9,9 +9,21 @@ if ENV['RACK_ENV'] == 'production'
     username == ENV['SIDEKIQ_WEB_USER'] && password == ENV['SIDEKIQ_WEB_PASSWORD']
   end
 end
+map '/sidekiq' do
+  run Sidekiq::Web
+end
+
+# Setup Asset Pipeline
+require 'sprockets'
+map '/assets' do
+  environment = Sprockets::Environment.new
+  environment.append_path 'assets/javascripts'
+  environment.append_path 'assets/stylesheets'
+  run environment
+end
 
 # Setup Sinatra
 require './eventbox_web'
-
-# Map out the application paths
-run Rack::URLMap.new('/' => EventBoxWeb, '/sidekiq' => Sidekiq::Web)
+map '/' do
+  run EventBoxWeb
+end

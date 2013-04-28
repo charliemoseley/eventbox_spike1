@@ -14,7 +14,6 @@ gem 'puma', '~> 2.0.0.b7'
 
 # Sinatra App
 gem 'sinatra'
-gem 'sinatra-assetpack'
 gem 'pg'
 gem 'activerecord'
 gem 'sinatra-activerecord'
@@ -22,6 +21,11 @@ gem 'omniauth-google-oauth2'
 gem 'omniauth-meetup'
 gem 'rack-flash3'
 gem 'rack_csrf'
+
+# Asset Pipeline
+gem 'sprockets'
+gem 'coffee-script'
+gem "sass", "~> 3.3.0.alpha.134"
 
 # Workers
 gem 'sidekiq'
