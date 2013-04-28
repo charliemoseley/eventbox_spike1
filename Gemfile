@@ -28,5 +28,6 @@ gem 'hashie'
 gem 'pry'
 
 group :development do
+  gem 'shotgun'
   gem 'coderay'
 end
