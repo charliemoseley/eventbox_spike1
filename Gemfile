@@ -1,5 +1,12 @@
 source 'https://rubygems.org'
-ruby '1.9.3', engine: 'rbx', engine_version: '2.0.0.rc1'
+
+group :production do
+  ruby '1.9.3', engine: 'rbx', engine_version: '2.0.0.rc1'
+end
+
+group :development do
+  ruby '2.0.0'
+end
 
 # Architectural
 gem 'foreman'
@@ -14,6 +21,7 @@ gem 'sinatra-activerecord'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-meetup'
 gem 'rack-flash3'
+gem 'rack_csrf'
 
 # Workers
 gem 'sidekiq'

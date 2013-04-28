@@ -1,5 +1,9 @@
 class EventBoxWeb
   set :root, File.dirname(__FILE__)
+
+  #CSRF
+  use Rack::Session::Cookie
+  use Rack::Csrf
   
   # Assetpack
   register Sinatra::AssetPack

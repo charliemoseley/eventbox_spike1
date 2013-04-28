@@ -3,6 +3,7 @@ require 'sinatra/activerecord'
 require 'omniauth'
 require 'rack-flash'
 require 'sinatra/assetpack'
+require "rack/csrf"
 
 require_relative '../models/boot'
 require_relative '../workers/boot'
@@ -19,9 +20,17 @@ class EventBoxWeb < Sinatra::Base
   end
   
   before do
-    pass if %w[auth error logout message].include? request.path_info.split('/')[1]
-    pass if request.path_info == '/'
-    
+    pass if public_pages
+    login_required
+  end
+
+  def public_pages
+    return true if request.path_info == '/'
+    p = %w[auth error logout message wait-list]
+    p.include? request.path_info.split('/')[1]
+  end
+
+  def login_required
     unless current_user
       flash[:error] = "You need to be logged in to access this page."
       redirect '/'
@@ -30,6 +39,10 @@ class EventBoxWeb < Sinatra::Base
   
   get '/' do
     erb :'pages/index'
+  end
+
+  post '/wait-list' do
+    puts "Success!"
   end
   
   get '/auth/google_oauth2/callback' do
