@@ -25,7 +25,9 @@ gem 'rack_csrf'
 # Asset Pipeline
 gem 'sprockets'
 gem 'coffee-script'
-gem "sass", "~> 3.3.0.alpha.134"
+gem 'sprockets-sass'
+gem 'sprockets-helpers'
+gem 'sass', '~> 3.3.0.alpha.134'
 
 # Workers
 gem 'sidekiq'
