@@ -1,22 +1,13 @@
-class EventBoxWeb
-  # set :root, File.dirname(__FILE__)
+require 'sinatra/base'
+require 'sinatra/activerecord'
+require 'omniauth'
+require 'rack-flash'
+require 'rack/csrf'
 
+class EventBoxWeb < Sinatra::Base
   #CSRF
   use Rack::Session::Cookie
   use Rack::Csrf
-  
-  # Assetpack
-  # register Sinatra::AssetPack
-  # assets do
-  #   serve '/css', from: 'assets/css'
-  #   css :application, ['/css/vendor/*.css', '/css/app/*.css']
-    
-  #   serve '/js', from: 'assets/js'
-  #   js :application, ['/js/vendor/*', '/js/app/*']
-  #   js :modernizr,   ['/js/special/modernizr.js']
-    
-  #   serve '/images', from: 'assets/images'
-  # end
   
   # Sessions
   enable :sessions
