@@ -1,22 +1,22 @@
 class EventBoxWeb
-  set :root, File.dirname(__FILE__)
+  # set :root, File.dirname(__FILE__)
 
   #CSRF
   use Rack::Session::Cookie
   use Rack::Csrf
   
   # Assetpack
-  register Sinatra::AssetPack
-  assets do
-    serve '/css', from: 'assets/css'
-    css :application, ['/css/vendor/*.css', '/css/app/*.css']
+  # register Sinatra::AssetPack
+  # assets do
+  #   serve '/css', from: 'assets/css'
+  #   css :application, ['/css/vendor/*.css', '/css/app/*.css']
     
-    serve '/js', from: 'assets/js'
-    js :application, ['/js/vendor/*', '/js/app/*']
-    js :modernizr,   ['/js/special/modernizr.js']
+  #   serve '/js', from: 'assets/js'
+  #   js :application, ['/js/vendor/*', '/js/app/*']
+  #   js :modernizr,   ['/js/special/modernizr.js']
     
-    serve '/images', from: 'assets/images'
-  end
+  #   serve '/images', from: 'assets/images'
+  # end
   
   # Sessions
   enable :sessions

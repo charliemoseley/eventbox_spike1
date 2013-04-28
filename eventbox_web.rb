@@ -5,13 +5,13 @@ require 'rack-flash'
 require 'sinatra/assetpack'
 require "rack/csrf"
 
-require_relative '../models/boot'
-require_relative '../workers/boot'
-require_relative '../lib/echidna/echidna'
-require_relative '../lib/gcalendar/gcalendar'
+require_relative 'models/boot'
+require_relative 'workers/boot'
+require_relative 'lib/echidna/echidna'
+require_relative 'lib/gcalendar/gcalendar'
 
 class EventBoxWeb < Sinatra::Base
-  require_relative 'config'
+  require_relative 'config/sinatra'
   
   helpers do
     def current_user
