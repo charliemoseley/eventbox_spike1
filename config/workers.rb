@@ -7,11 +7,12 @@ require_relative '../lib/echidna/echidna'
 require_relative '../lib/gcalendar/gcalendar'
 
 # Load up the models
-require_relative '../config/models'
+require_relative 'models'
 
 # Load up the workers
-require_relative 'message/test'
-require_relative 'gcal/create_upcoming_calendar'
+# TODO: Make this scan the models directory and autoload everything.
+require_relative '../workers/message/test'
+require_relative '../workers/gcal/create_upcoming_calendar'
 
 # Setup the defaults for our Oauth2 connections
 GCalendar::Config.client_id     = ENV['GOOGLE_KEY']

@@ -1,9 +1,7 @@
-require_relative 'workers/boot'
-require_relative 'lib/echidna/echidna'
-require_relative 'lib/gcalendar/gcalendar'
-
 require_relative 'config/models'
+require_relative 'config/workers'
 require_relative 'config/sinatra'
+
 class EventBoxWeb < Sinatra::Base
   before do
     pass if public_pages
