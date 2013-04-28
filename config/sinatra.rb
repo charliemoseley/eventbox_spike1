@@ -9,7 +9,11 @@ require 'rack/csrf'
 class EventBoxWeb < Sinatra::Base
   #CSRF
   use Rack::Session::Cookie
-  use Rack::Csrf
+  if ENV['RACK_ENV'] == 'development'
+    use Rack::Csrf, raise: true
+  else
+    use Rack::Csrf
+  end
   
   # Sessions
   enable :sessions

@@ -4,16 +4,21 @@ require_relative 'config/sinatra'
 
 class EventBoxWeb < Sinatra::Base  
   get '/' do
-    erb :'pages/index'
+    erb :'pages/index', layout: :'layout_homepage'
+  end
+
+  get '/login' do
+    erb :'pages/login', layout: :'layout_homepage'
   end
   
   post '/wait-list' do
-    puts "Success!"
+    flash[:notice] = "Thanks for signing up!"
+    redirect '/'
   end
   
   get '/dashboard' do
     protected_page
-    erb :'pages/dashboard', layout: :'layout_homepage'
+    erb :'pages/dashboard'
   end
   
   # Test Routes

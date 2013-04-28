@@ -3,6 +3,7 @@
     <h1 class="letter-press">Eventbox.io</h1><br />
     <br />
     <form action="/wait-list" method="post">
+      <%= Rack::Csrf.tag(env) %>
       <p>Leave your email to be notified when we launch.</p>
       <input type="text" name="email">
       <p><input type="submit" value="Sign up"></p>
