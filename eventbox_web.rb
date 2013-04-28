@@ -13,7 +13,7 @@ class EventBoxWeb < Sinatra::Base
   
   get '/dashboard' do
     protected_page
-    erb :'pages/dashboard'
+    erb :'pages/dashboard', layout: :'layout_homepage'
   end
   
   # Test Routes

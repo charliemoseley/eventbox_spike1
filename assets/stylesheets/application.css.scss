@@ -1,5 +1,18 @@
 @import 'bootstrap';
 
-html {
+.container {
+  margin: auto;
+}
+
+.letter-press {
+  text-shadow: 0px 1px 1px #FFF1DF;
+  color: #685F53;
+  font-size: 80px;
+  font-family: 'Noto Sans', sans-serif;
+}
+
+#home {
+  padding-top: 100px;
   background: asset-url("retina_wood.png");
 }
+
