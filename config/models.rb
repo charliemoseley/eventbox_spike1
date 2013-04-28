@@ -13,6 +13,7 @@ ActiveRecord::Base.establish_connection \
   encoding: 'utf8'
 
 # Load up all the models
-require_relative 'user'
-require_relative 'account'
-require_relative 'calendar'
+# TODO: Make this scan the models directory and autoload everything.
+require_relative '../models/user'
+require_relative '../models/account'
+require_relative '../models/calendar'

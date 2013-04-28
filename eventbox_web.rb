@@ -1,16 +1,10 @@
-require_relative 'models/boot'
 require_relative 'workers/boot'
 require_relative 'lib/echidna/echidna'
 require_relative 'lib/gcalendar/gcalendar'
 
+require_relative 'config/models'
 require_relative 'config/sinatra'
 class EventBoxWeb < Sinatra::Base
-  helpers do
-    def current_user
-      @current_user ||= User.find session[:user_id] if session[:user_id]
-    end
-  end
-  
   before do
     pass if public_pages
     login_required
@@ -75,12 +69,5 @@ class EventBoxWeb < Sinatra::Base
     session[:user_id] = nil
     flash[:notice] = "You have been logged out."
     redirect '/'
-  end
-
-  helpers do
-    def current_path
-      return "home" if request.path_info == "/"
-      request.path_info[1..request.path_info.length]
-    end
   end
 end

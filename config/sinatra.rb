@@ -1,9 +1,11 @@
+# Load all the gems
 require 'sinatra/base'
 require 'sinatra/activerecord'
 require 'omniauth'
 require 'rack-flash'
 require 'rack/csrf'
 
+# Do any sinatra configuration required
 class EventBoxWeb < Sinatra::Base
   #CSRF
   use Rack::Session::Cookie
@@ -24,3 +26,8 @@ class EventBoxWeb < Sinatra::Base
     provider :meetup, ENV['MEETUP_KEY'], ENV['MEETUP_SECRET']
   end
 end
+
+# Load up the helpers for sinatra
+# TODO: Make this scan the helpers directory and autoload everything.
+require_relative '../helpers/application.rb'
+require_relative '../helpers/layout.rb'

@@ -7,7 +7,7 @@ require_relative '../lib/echidna/echidna'
 require_relative '../lib/gcalendar/gcalendar'
 
 # Load up the models
-require_relative '../models/boot'
+require_relative '../config/models'
 
 # Load up the workers
 require_relative 'message/test'
