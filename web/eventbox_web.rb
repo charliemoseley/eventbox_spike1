@@ -55,6 +55,7 @@ class EventBoxWeb < Sinatra::Base
   end
 
   get '/test' do
+    puts "Hi, test output"
   end
   
   get '/message' do
@@ -69,5 +70,12 @@ class EventBoxWeb < Sinatra::Base
     session[:user_id] = nil
     flash[:notice] = "You have been logged out."
     redirect '/'
+  end
+
+  helpers do
+    def current_path
+      return "home" if request.path_info == "/"
+      request.path_info[1..request.path_info.length]
+    end
   end
 end

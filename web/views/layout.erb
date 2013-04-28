@@ -16,7 +16,7 @@
   <%= js  :modernizr %>
 </head>
 
-<body>
+<body id="<%= current_path %>">
   <h1>Event Box</h1>
   <div id="flash-container" class="fixed-container">
   <% flash.keys.each do | key | %>
