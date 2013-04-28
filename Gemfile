@@ -1,11 +1,10 @@
 source 'https://rubygems.org'
 
-group :production do
-  ruby '1.9.3', engine: 'rbx', engine_version: '2.0.0.rc1'
-end
-
-group :development do
+# Heroku ignores the groups for the ruby command and takes the last one.
+if ENV['RACK_ENV'].nil? || ENV['RACK_ENV'].eql?('development')
   ruby '2.0.0'
+else
+  ruby '1.9.3', engine: 'rbx', engine_version: '2.0.0.rc1'
 end
 
 # Architectural
