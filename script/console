@@ -1,33 +1,21 @@
 #!/usr/bin/env ruby
 
-require File.expand_path('../../web/eventbox_web', __FILE__)
-require 'bundler'
-
+# Load bundler, and then load up our environmental variables.
 Bundler.require(:default, :console)
+require 'bundler'
+require 'dotenv'
+Dotenv.load
 
-# include rack helpers to play around with
-include Rack::Test::Methods
-self.instance_eval do
-  @app = EventBoxWeb.new
-  def app; @app; end
-end
+# Load up our sinatra app that loads everything else.
+require File.expand_path('../../eventbox_web', __FILE__)
 
-# add ability to reload console
+# Add ability to reload console
 def reload
-  reload_msg = '# Reloading the console...'
-  puts CodeRay.scan(reload_msg, :ruby).term
   Pry.save_history
   exec(__FILE__)
 end
 alias :reload! :reload
 
-# start the console! :-)
-system('clear')
-
-welcome = <<eos
- Eventbox Console
-eos
-
-puts CodeRay.scan(welcome, :ruby).term
-
+# Start up the console
+puts "Eventbox Console"
 Pry.start

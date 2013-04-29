@@ -1,11 +1,5 @@
 source 'https://rubygems.org'
-
-# Heroku ignores the groups for the ruby command and takes the last one.
-# if ENV['RACK_ENV'].nil? || ENV['RACK_ENV'].eql?('development')
-#   ruby '2.0.0'
-# else
-  ruby '1.9.3', engine: 'rbx', engine_version: '2.0.0.rc1'
-# end
+ruby '1.9.3', engine: 'rbx', engine_version: '2.0.0.rc1'
 
 # Architectural
 gem 'foreman'
@@ -38,9 +32,7 @@ gem 'json'
 gem 'hashie'
 
 # Development Tools
-gem 'pry'
-
+gem 'pry' # Left outside the dev block to make Heroku use this as our console.
 group :development do
   gem 'shotgun'
-  gem 'coderay'
 end
