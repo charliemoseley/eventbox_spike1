@@ -4,6 +4,7 @@ ruby '1.9.3', engine: 'rbx', engine_version: '2.0.0.rc1'
 # Architectural
 gem 'foreman'
 gem 'puma', '~> 2.0.0.b7'
+gem 'rake'
 
 # Sinatra App
 gem 'sinatra'

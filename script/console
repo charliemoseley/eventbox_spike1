@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 # Load bundler, and then load up our environmental variables.
-Bundler.require(:default, :console)
 require 'bundler'
+Bundler.require(:default, :console)
 require 'dotenv'
 Dotenv.load
 
