@@ -3,7 +3,7 @@ class Account < ActiveRecord::Base
   has_many   :calendars
     
   def self.create_or_update(omniauth)
-    account = Account.find_by_provider_and_uid(omniauth.provider, omniauth.uid) ||
+    account = Account.find_by_provider_and_uid(omniauth.provider, omniauth.uid.to_s) ||
               Account.new
     account.provider      = omniauth.provider
     account.uid           = omniauth.uid
