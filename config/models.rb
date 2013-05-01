@@ -17,3 +17,5 @@ ActiveRecord::Base.establish_connection \
 require_relative '../models/user'
 require_relative '../models/account'
 require_relative '../models/calendar'
+require_relative '../models/event'
+require_relative '../models/event_rsvp'
