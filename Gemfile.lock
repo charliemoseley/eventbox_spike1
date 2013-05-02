@@ -124,6 +124,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  celluloid
   coffee-script
   foreman
   hashie
@@ -136,6 +137,7 @@ DEPENDENCIES
   rack-flash3
   rack_csrf
   rake
+  redis
   sass (~> 3.3.0.alpha.134)
   shotgun
   sidekiq

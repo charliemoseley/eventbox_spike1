@@ -15,6 +15,8 @@ gem 'omniauth-google-oauth2'
 gem 'omniauth-meetup'
 gem 'rack-flash3'
 gem 'rack_csrf'
+gem 'redis'
+gem 'celluloid'
 
 # Asset Pipeline
 gem 'sprockets'
