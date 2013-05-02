@@ -12,5 +12,7 @@ class CreateCalendars < ActiveRecord::Migration
       t.timestamps
     end
     add_index :calendars, :calendar_id, unique: true
+    add_index :calendars, :user_id
+    add_index :calendars, :account_id
   end
 end
