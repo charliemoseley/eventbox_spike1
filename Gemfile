@@ -9,7 +9,7 @@ gem 'rake'
 # Sinatra App
 gem 'sinatra'
 gem 'pg'
-gem 'activerecord', "~> 4.0.0.rc1"
+gem 'activerecord', '~> 4.0.0.rc1'
 gem 'sinatra-activerecord'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-meetup'
@@ -27,7 +27,7 @@ gem 'sass', '~> 3.3.0.alpha.134'
 
 # Workers
 gem 'sidekiq'
-gem 'slim'
+gem 'slim', '~> 1.3.8'
 
 # For Google Library
 gem 'typhoeus'

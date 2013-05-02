@@ -4,10 +4,8 @@ class Account < ActiveRecord::Base
   has_many   :subscriptions
     
   def self.create_or_update(omniauth)
-    account = Account.find_by_provider_and_provider_uid \
-               omniauth.provider, 
-               omniauth.uid.to_s ||
-               Account.new
+    account = Account.find_by_provider_and_provider_uid( \
+                omniauth.provider, omniauth.uid.to_s) || Account.new
     account.provider      = omniauth.provider
     account.provider_uid  = omniauth.uid
     account.name          = omniauth.info.name          rescue nil

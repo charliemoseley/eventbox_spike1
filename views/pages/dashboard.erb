@@ -12,7 +12,7 @@ Welcome <%= current_user.name %>!<br />
   <% current_user.accounts.each do |account| %>
     <tr>
       <td><%= account.provider %></td>
-      <td><%= account.uid %></td>
+      <td><%= account.provider_uid %></td>
     </tr>
   <% end %>
 </table>
