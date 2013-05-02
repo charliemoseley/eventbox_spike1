@@ -1,8 +1,9 @@
 class User < ActiveRecord::Base
   has_many :accounts
-  has_many :calendars
-  has_many :rsvps
-  has_many :events, through: :rsvps
+  has_many :subscriptions
+  has_many :archives
+  has_many :events, through: :archives
+  has_many :rsvps,  through: :archives
   
   def self.login(omniauth)
     ActiveRecord::Base.transaction do

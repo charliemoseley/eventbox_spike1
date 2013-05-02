@@ -1,12 +1,15 @@
 class Account < ActiveRecord::Base
   belongs_to :user
   has_many   :calendars
+  has_many   :subscriptions
     
   def self.create_or_update(omniauth)
-    account = Account.find_by_provider_and_uid(omniauth.provider, omniauth.uid.to_s) ||
-              Account.new
+    account = Account.find_by_provider_and_provider_uid \
+               omniauth.provider, 
+               omniauth.uid.to_s ||
+               Account.new
     account.provider      = omniauth.provider
-    account.uid           = omniauth.uid
+    account.provider_uid  = omniauth.uid
     account.name          = omniauth.info.name          rescue nil
     account.first_name    = omniauth.info.first_name    rescue nil
     account.last_name     = omniauth.info.last_name     rescue nil

@@ -1,4 +1,5 @@
 class Rsvp < ActiveRecord::Base
-  belongs_to :event
-  belongs_to :user
+  has_one  :archive
+  has_one  :user, through: :archive
+  has_many :subscriptions, as: :subscribable
 end
