@@ -7,25 +7,58 @@ module Worker
       include Sidekiq::Worker
       
       def perform(account_id)
-        account = Account.includes(:user).find(account_id)
+        account = Account.find(account_id)
+        account = CalendarAccount.new(account)
 
-        # We don't have a calendar for this user
-        if account.calendars.empty?
-          external_calendar = create_external_calendar account
-          create_internal_calendar account, external_calendar
+        ########################################################################
+        # Case: No calendars in our internal record
+        ########################################################################
+        unless account.has_calendars?
+          # Create a new internal record for the primary calendar if we don't have it.
+          if account.primary_calendar.nil?
+            ex_primary_calendar = find_external_primary_calendar account
+            in_primary_calendar = create_internal_calendar account,
+                                    ex_primary_calendar, "primary"
+          end
+
+          # Create a new internal record for the upcoming calendar if we don't have it.
+          if account.upcoming_calendar.nil?
+            ex_primary_calendar = create_upcoming_calendar account
+            in_primary_calendar = create_internal_calendar account,
+                                    ex_primary_calendar, "upcoming"
+          end
+
           return true
         end
 
-        # We do have a calendar on our internal record
-        internal_calendar = account.calendars.select{ |c| c.provider == "google" }.first
-        external_calendar = find_external_calendar account, internal_calendar.calendar_id
+        ########################################################################
+        # Case: Calendars where found in our internal record
+        ########################################################################
+        in_primary_calendar  = account.primary_calendar
+        in_upcoming_calendar = account.upcoming_calendar
+        ex_primary_calendar  = find_external_calendar \
+                                 account, 
+                                 in_primary_calendar.provider_calendar_id
+        ex_upcoming_calendar = find_external_calendar \
+                                 account, 
+                                 in_upcoming_calendar.provider_calendar_id
 
-        # Something went wrong
-        if external_calendar.kind_of? Echidna::Error
-          if external_calendar.body.error.code == 404
+        ########################################################################
+        # Case: Calendars where found in our internal record
+        ########################################################################
+
+        # TODO: Their primary calendar is gone; we're fucked.
+
+        # The upcoming calendar is missing
+        if ex_upcoming_calendar.kind_of? Echidna::Error
+          if ex_upcoming_calendar.body.error.code == 404
             # The calendar just couldn't be found, so let's recreate it.
-            external_calendar = create_external_calendar account
-            update_internal_calendar account, internal_calendar, external_calendar
+            ex_upcoming_calendar = create_upcoming_calendar account
+            update_internal_calendar \
+              in_upcoming_calendar.id,
+              account, 
+              ex_upcoming_calendar,
+              "upcoming"
             return true
           else
             #  Raise an error so Sidekiq can try again later
@@ -42,11 +75,18 @@ module Worker
         # EXCESSIVE QUERIES
       end
 
-      def create_external_calendar(account)
+      def find_external_primary_calendar(account)
+        calendar = GCalendar::Calendar.primary_calendar \
+                     access_token:  account.token,
+                     refresh_token: account.refresh_token,
+                     user_uid:      account.provider_uid
+      end
+
+      def create_upcoming_calendar(account)
         calendar = GCalendar::Calendar.new \
                      access_token:  account.token,
                      refresh_token: account.refresh_token,
-                     user_uid:      account.uid
+                     user_uid:      account.provider_uid
         calendar.summary = "Upcoming Events (EventBox.io)"
         calendar.save
 
@@ -57,31 +97,30 @@ module Worker
         GCalendar::Calendar.find calendar_id,
                                  access_token:  account.token,
                                  refresh_token: account.refresh_token,
-                                 user_uid:      account.uid
+                                 user_uid:      account.provider_uid
       end
 
-      def create_internal_calendar(account, external_calendar)
-        internal_calendar = Calendar.new
-        internal_calendar.user        = account.user
-        internal_calendar.account     = account
-        internal_calendar.provider    = "google"
-        internal_calendar.purpose     = "upcoming"
-        internal_calendar.calendar_id = external_calendar.id
-        internal_calendar.etag        = external_calendar.etag
-        internal_calendar.raw         = external_calendar.to_json
+      def create_internal_calendar(account, external_calendar, purpose)
+        internal_calendar                      = Calendar.new
+        internal_calendar.account              = account.to_account
+        internal_calendar.provider             = "google"
+        internal_calendar.provider_calendar_id = external_calendar.id
+        internal_calendar.purpose              = purpose
+        internal_calendar.etag                 = external_calendar.etag
+        internal_calendar.raw                  = external_calendar.to_json
         internal_calendar.save
 
         internal_calendar
       end
 
-      def update_internal_calendar(account, internal_calendar, external_calendar)
-        internal_calendar.user        = account.user
-        internal_calendar.account     = account
-        internal_calendar.provider    = "google"
-        internal_calendar.purpose     = "upcoming"
-        internal_calendar.calendar_id = external_calendar.id
-        internal_calendar.etag        = external_calendar.etag
-        internal_calendar.raw         = external_calendar.to_json
+      def update_internal_calendar(calendar_id, account, external_calendar, purpose)
+        internal_calendar = Calendar.find(calendar_id)
+        internal_calendar.account              = account.to_account
+        internal_calendar.provider             = "google"
+        internal_calendar.provider_calendar_id = external_calendar.id
+        internal_calendar.purpose              = purpose
+        internal_calendar.etag                 = external_calendar.etag
+        internal_calendar.raw                  = external_calendar.to_json
         internal_calendar.save
 
         internal_calendar

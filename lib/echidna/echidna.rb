@@ -35,7 +35,7 @@ module Echidna
   class Connection
     attr_reader   :client_id, :client_secret, :refresh_token_url, :provider
     attr_accessor :callback_request_made, :callback_token_refreshed, 
-                  :hydra
+                  :hydra, :authorization_bearer
     
     def initialize(options = {})
       # Go through the configuration chain and set all the properties for this
@@ -44,7 +44,7 @@ module Echidna
       @refresh_token_url = options[:refresh_token_url] || Echidna::Config.refresh_token_url
       @client_id         = options[:client_id] || Echidna::Config.client_id
       @client_secret     = options[:client_secret] || Echidna::Config.client_secret
-      
+      @authorization_bearer = options[:authorization_bearer] || Echidna::Config.authorization_bearer
       
       @callback_request_made = \
         options[:callback_request_made] ||
@@ -66,6 +66,7 @@ module Echidna
       end
       
       config = RequestConfig.new
+      config.authorization_bearer = @authorization_bearer
       config.method = method
       config.access_token   = options[:access_token]
       config.request_params = options[:request_params]
@@ -140,7 +141,7 @@ module Echidna
   end
   
   class RequestConfig < Hashie::Mash
-    attr_accessor :form_encoding
+    attr_accessor :form_encoding, :authorization_bearer
     
     def content_type=(content_type)
       return self if content_type.nil?
@@ -153,7 +154,7 @@ module Echidna
       return self if access_token.nil?
       self.headers = {} if self.headers.nil?
       
-      self.headers.Authorization = "#{Echidna::Config.authorization_bearer} #{access_token}"
+      self.headers.Authorization = "#{@authorization_bearer} #{access_token}"
       self
     end
     

@@ -11,6 +11,7 @@ module GCalendar
     extend self
     PROVIDER = "google".freeze
     REFRESH_TOKEN_URL = "https://accounts.google.com/o/oauth2/token".freeze
+    AUTHORIZATION_BEARER = "Bearer".freeze
 
     # Passed to Echidna on intialization
     attr_accessor :client_id, :client_secret
@@ -33,6 +34,7 @@ module GCalendar
 
       Echidna::Connection.new provider: GCalendar::Config.provider,
                               refresh_token_url: GCalendar::Config.refresh_token_url,
+                              authorization_bearer: GCalendar::Config::AUTHORIZATION_BEARER,
                               client_id: client_id,
                               client_secret: client_secret,
                               callback_request_made: callback_request_made,

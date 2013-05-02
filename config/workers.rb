@@ -20,7 +20,7 @@ GCalendar::Config.client_id     = ENV['GOOGLE_KEY']
 GCalendar::Config.client_secret = ENV['GOOGLE_SECRET']
 GCalendar::Config.callback_token_refreshed = ->(provider, user_uid, response) do
   provider = provider + "_oauth2"
-  account = Account.find_by_provider_and_uid(provider, user_uid)
+  account = Account.find_by_provider_and_provider_uid(provider, user_uid)
   account.token = response.access_token
   account.save
 end
@@ -31,7 +31,7 @@ Echidna::Config.authorization_bearer = "bearer"
 Echidna::Config.client_id            = ENV['MEETUP_KEY']
 Echidna::Config.client_secret        = ENV['MEETUP_SECRET']
 Echidna::Config.callback_token_refreshed = ->(provider, user_uid, response) do
-  account = Account.find_by_provider_and_uid(provider, user_uid)
+  account = Account.find_by_provider_and_provider_uid(provider, user_uid)
   account.token         = response.access_token
   account.refresh_token = response.refresh_token
   account.save

@@ -16,6 +16,7 @@ ActiveRecord::Base.establish_connection \
 # TODO: Make this scan the models directory and autoload everything.
 require_relative '../models/user'
 require_relative '../models/account'
+require_relative '../models/calendar_account'
 require_relative '../models/calendar'
 require_relative '../models/event'
 require_relative '../models/rsvp'
