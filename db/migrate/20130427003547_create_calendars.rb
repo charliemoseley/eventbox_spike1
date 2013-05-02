@@ -12,6 +12,6 @@ class CreateCalendars < ActiveRecord::Migration
     end
     
     add_index :calendars, [:account_id, :provider]
-    add_index :calendars, [:provider, :calendar_id], unique: true
+    add_index :calendars, [:provider, :provider_calendar_id], unique: true
   end
 end

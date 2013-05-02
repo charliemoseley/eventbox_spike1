@@ -9,12 +9,13 @@ class CreateEventsAndRsvps < ActiveRecord::Migration
       
       t.timestamps
     end
-    add_index :events, [:provider, :provider_id], unique: true
+    
+    add_index :events, [:provider, :provider_source_id], unique: true
     add_index :events, :digest, unique: true
 
     create_table :rsvps, id: :uuid do |t|
       t.string   :status,     null: false
-      t.string   :extra,
+      t.string   :extra
       t.datetime :last_update
 
       t.timestamps

@@ -1,5 +1,7 @@
 class CreateUsers < ActiveRecord::Migration
-  def change
+  def up
+    enable_extension 'uuid-ossp'
+
     create_table :users, id: :uuid do |t|
       t.string :name
       t.string :first_name
@@ -11,5 +13,9 @@ class CreateUsers < ActiveRecord::Migration
     end
     
     add_index :users, :email, unique: true
+  end
+
+  def down
+    drop_table :users
   end
 end

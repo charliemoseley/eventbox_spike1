@@ -9,7 +9,7 @@ gem 'rake'
 # Sinatra App
 gem 'sinatra'
 gem 'pg'
-gem 'activerecord'
+gem 'activerecord', "~> 4.0.0.rc1"
 gem 'sinatra-activerecord'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-meetup'
