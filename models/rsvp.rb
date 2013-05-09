@@ -5,7 +5,13 @@ class Rsvp < ActiveRecord::Base
   has_many :subscriptions, as: :subscribable
 
   def self.find_with_user_and_event(user, event)
-    Rsvp.joins(:user).where(id: user.id).join(:event).where(id: event.id).first
+    Rsvp.joins(:subscriptions).where(
+      subscriptions: {
+        subscribable_type: "Rsvp",
+        provider_source_uid: event.provider_source_uid,
+        user: user
+      }
+    ).first
   end
 
   def self.update_subscribers(id, time)

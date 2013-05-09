@@ -27,11 +27,24 @@ end
 
 # Setup the defaults for Echidna to handle Meetup
 Echidna::Config.refresh_token_url    = "https://secure.meetup.com/oauth2/access"
+Echidna::Config.provider             = "meetup"
 Echidna::Config.authorization_bearer = "bearer"
 Echidna::Config.client_id            = ENV['MEETUP_KEY']
 Echidna::Config.client_secret        = ENV['MEETUP_SECRET']
 Echidna::Config.callback_token_refreshed = ->(provider, user_uid, response) do
   account = Account.find_by_provider_and_provider_uid(provider, user_uid)
+
+  puts "*" * 88
+  puts "MEETUP REFRESH"
+  puts "provider: #{provider}"
+  puts "user_uid: #{user_uid}"
+  puts "response:"
+  puts response.inspect
+  puts "-----"
+  puts "account:"
+  puts account.inspect
+  puts "*" * 88
+  
   account.token         = response.access_token
   account.refresh_token = response.refresh_token
   account.save

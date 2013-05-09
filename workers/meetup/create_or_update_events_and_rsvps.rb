@@ -10,7 +10,7 @@ module Worker
         account       = Account.find account_id
         access_token  = account.token
         refresh_token = account.refresh_token
-        member_id     = account.uid
+        member_id     = account.provider_uid
         user          = account.user
 
         c = Echidna::Connection.new
@@ -18,6 +18,7 @@ module Worker
         # --- Base Get All User Events All ---
         e = c.api :get, "https://api.meetup.com/2/events", 
                   access_token: access_token, refresh_token: refresh_token,
+                  user_uid: account.provider_uid,
                   request_params: {
                     member_id: member_id,
                     fields: "self"
@@ -30,33 +31,75 @@ module Worker
           event_json   = event.to_json
           event_digest = Digest::SHA1.hexdigest(event_json)
 
-          local_event = Event.select('id, digest').find_by_provider_and_provider_id \
+          # START EVENT HANDLING
+          local_event = Event.select('id, digest').find_by_provider_and_provider_source_uid\
                           "meetup", event.id
-          local_event = if local_event.nil?
-            Event.create \
-              provider: "meetup",
-              provider_id: event.id,
-              raw: event_json,
-              digest: event_digest
+          # This is a new event
+          if local_event.nil?
+            ActiveRecord::Base.transaction do
+              # Create the event and subscription
+              local_event = Event.create \
+                provider: "meetup",
+                provider_source_uid: event.id,
+                raw: event_json,
+                digest: event_digest
+
+              # Meetup stores their dates as milliseconds from epoch
+              event_sub = Subscription.create \
+                user: user,
+                subscribable: local_event,
+                provider: "meetup",
+                provider_source_uid: local_event.provider_source_uid,
+                account: account,
+                last_update: Time.now,
+                event_date: Time.at(event.time/1000)
+            end
           else
+          # The event already exists in our system
             # Update the event if anything has changed.
             if local_event.digest != event_digest
               local_event.raw    = event_json
               local_event.digest = event_digest
               local_event.save
-            end
-            local_event
-          end
 
-          event_status = user_info.rsvp.response rescue "unspecified"
-          rsvp = EventRsvp.find_by_user_id_and_event_id user.id, local_event.id
-          rsvp = if rsvp.nil?
-            EventRsvp.create user_id: user.id, event_id: local_event.id, 
-                             status: event_status, extra: user_info.to_json
+              # Push changes to pubsub
+              data = { event_id: local_event.id, timestamp: Time.now }
+              $redis.publish "events", data
+            end
+          end
+          # END EVENT HANDLING
+
+          # START RSVP HANDLING
+          rsvp_status = user_info.rsvp.response rescue "unspecified"
+          local_rsvp = Rsvp.find_with_user_and_event(user, event)
+          # This is a new rsvp
+          if local_rsvp.nil?
+            ActiveRecord::Base.transaction do
+              local_rsvp = Rsvp.create \
+                status: rsvp_status,
+                extra:  user_info.to_json
+
+              rsvp_sub = Subscription.create \
+                user: user,
+                subscribable: local_rsvp,
+                provider: "meetup",
+                provider_source_uid: local_event.provider_source_uid,
+                account: account,
+                last_update: Time.now,
+                event_date: Time.at(event.time/1000)
+            end
           else
-            rsvp.status = event_status
-            rsvp.extra  = user_info.to_json
-            rsvp.save
+          # The RSVP already exists
+            # Update the rsvp if anything has changed.
+            if local_rsvp.status != rsvp_status
+              local_rsvp.status = rsvp_status
+              local_rsvp.extra  = user_info.to_json
+              local_rsvp.save
+
+              # Push changes to pubsub
+              data = { rsvp_id: local_rsvp.id, timestamp: Time.now }
+              $redis.publish "events", data
+            end
           end
         end
       end

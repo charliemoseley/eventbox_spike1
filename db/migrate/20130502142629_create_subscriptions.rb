@@ -5,7 +5,7 @@ class CreateSubscriptions < ActiveRecord::Migration
       t.string   :subscribable_type,  null: false # must be either event or rsvp
       t.uuid     :subscribable_id,    null: false
       t.string   :provider,           null: false
-      t.string   :provider_source_id, null: false
+      t.string   :provider_source_uid, null: false
       # this is the account credentials for said provider if required
       t.uuid     :account_id
       # the last time for when the update happened, used for resolving conflict

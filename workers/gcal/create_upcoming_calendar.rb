@@ -38,10 +38,10 @@ module Worker
         in_upcoming_calendar = account.upcoming_calendar
         ex_primary_calendar  = find_external_calendar \
                                  account, 
-                                 in_primary_calendar.provider_calendar_id
+                                 in_primary_calendar.provider_calendar_uid
         ex_upcoming_calendar = find_external_calendar \
                                  account, 
-                                 in_upcoming_calendar.provider_calendar_id
+                                 in_upcoming_calendar.provider_calendar_uid
 
         ########################################################################
         # Case: Calendars where found in our internal record
@@ -104,7 +104,7 @@ module Worker
         internal_calendar                      = Calendar.new
         internal_calendar.account              = account.to_account
         internal_calendar.provider             = "google"
-        internal_calendar.provider_calendar_id = external_calendar.id
+        internal_calendar.provider_calendar_uid = external_calendar.id
         internal_calendar.purpose              = purpose
         internal_calendar.etag                 = external_calendar.etag
         internal_calendar.raw                  = external_calendar.to_json
@@ -117,7 +117,7 @@ module Worker
         internal_calendar = Calendar.find(calendar_id)
         internal_calendar.account              = account.to_account
         internal_calendar.provider             = "google"
-        internal_calendar.provider_calendar_id = external_calendar.id
+        internal_calendar.provider_calendar_uid = external_calendar.id
         internal_calendar.purpose              = purpose
         internal_calendar.etag                 = external_calendar.etag
         internal_calendar.raw                  = external_calendar.to_json

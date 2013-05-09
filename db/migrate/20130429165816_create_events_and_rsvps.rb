@@ -2,7 +2,7 @@ class CreateEventsAndRsvps < ActiveRecord::Migration
   def change
     create_table :events, id: :uuid do |t|
       t.string   :provider,           null: false
-      t.string   :provider_source_id, null: false
+      t.string   :provider_source_uid, null: false
       t.text     :raw,                null: false
       t.string   :digest,             null: false
       t.datetime :last_update
@@ -10,7 +10,7 @@ class CreateEventsAndRsvps < ActiveRecord::Migration
       t.timestamps
     end
     
-    add_index :events, [:provider, :provider_source_id], unique: true
+    add_index :events, [:provider, :provider_source_uid], unique: true
     add_index :events, :digest, unique: true
 
     create_table :rsvps, id: :uuid do |t|
