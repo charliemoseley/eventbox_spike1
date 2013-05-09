@@ -16,8 +16,6 @@ module Adapter
       address += "#{venue.name}, " unless venue.name.nil? || venue.name.empty?
       address += "#{venue.address_1}"
       address += " #{venue.address_2}" unless venue.address_2.nil? || venue.address_2.empty?
-      puts "ZIP CODE!"
-      puts venue.zip.inspect
       address += ", #{venue.city}, #{venue.state}, #{venue[:zip]}"
       address += ", #{venue.country}" unless venue.country.nil? || venue.country.empty?
       adapter.address = address
