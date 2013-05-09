@@ -51,6 +51,7 @@ GEM
     minitest (4.7.4)
     multi_json (1.7.2)
     multipart-post (1.2.0)
+    nokogiri (1.5.9)
     oauth2 (0.8.1)
       faraday (~> 0.8)
       httpauth (~> 0.1)
@@ -137,6 +138,7 @@ DEPENDENCIES
   foreman
   hashie
   json
+  nokogiri
   omniauth-google-oauth2
   omniauth-meetup
   pg

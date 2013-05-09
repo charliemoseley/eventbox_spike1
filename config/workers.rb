@@ -21,6 +21,18 @@ GCalendar::Config.client_secret = ENV['GOOGLE_SECRET']
 GCalendar::Config.callback_token_refreshed = ->(provider, user_uid, response) do
   provider = provider + "_oauth2"
   account = Account.find_by_provider_and_provider_uid(provider, user_uid)
+  
+  puts "*" * 88
+  puts "GOOGLE REFRESH"
+  puts "provider: #{provider}"
+  puts "user_uid: #{user_uid}"
+  puts "response:"
+  puts response.inspect
+  puts "-----"
+  puts "account:"
+  puts account.inspect
+  puts "*" * 88
+
   account.token = response.access_token
   account.save
 end

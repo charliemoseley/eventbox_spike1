@@ -22,3 +22,6 @@ require_relative '../models/event'
 require_relative '../models/rsvp'
 require_relative '../models/subscription'
 require_relative '../models/archive'
+
+# Non AR moderls
+require_relative '../models/adapter'
