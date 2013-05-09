@@ -31,7 +31,7 @@ class PubSubServer
 
   def event_handler(msg)
     data = JSON.parse(msg)
-    Event.update_subscribers data['message_id'], data['timestamp']
+    Event.update_subscribers data['event_id'], data['timestamp']
   end
 
   def rsvp_handler(msg)
