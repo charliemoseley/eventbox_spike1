@@ -101,13 +101,13 @@ module Worker
       end
 
       def create_internal_calendar(account, external_calendar, purpose)
-        internal_calendar                      = Calendar.new
-        internal_calendar.account              = account.to_account
-        internal_calendar.provider             = "google"
+        internal_calendar                       = Calendar.new
+        internal_calendar.account               = account.to_account
+        internal_calendar.provider              = "google"
         internal_calendar.provider_calendar_uid = external_calendar.id
-        internal_calendar.purpose              = purpose
-        internal_calendar.etag                 = external_calendar.etag
-        internal_calendar.raw                  = external_calendar.to_json
+        internal_calendar.purpose               = purpose
+        internal_calendar.etag                  = external_calendar.etag
+        internal_calendar.raw                   = external_calendar.to_json
         internal_calendar.save
 
         internal_calendar
@@ -115,12 +115,12 @@ module Worker
 
       def update_internal_calendar(calendar_id, account, external_calendar, purpose)
         internal_calendar = Calendar.find(calendar_id)
-        internal_calendar.account              = account.to_account
-        internal_calendar.provider             = "google"
+        internal_calendar.account               = account.to_account
+        internal_calendar.provider              = "google"
         internal_calendar.provider_calendar_uid = external_calendar.id
-        internal_calendar.purpose              = purpose
-        internal_calendar.etag                 = external_calendar.etag
-        internal_calendar.raw                  = external_calendar.to_json
+        internal_calendar.purpose               = purpose
+        internal_calendar.etag                  = external_calendar.etag
+        internal_calendar.raw                   = external_calendar.to_json
         internal_calendar.save
 
         internal_calendar
