@@ -11,7 +11,9 @@ ActiveRecord::Base.establish_connection \
   username: db.user,
   password: db.password,
   database: db.path[1..-1],
-  encoding: 'utf8'
+  encoding: 'utf8',
+  pool:      25
+
 
 # Load up all the models
 # TODO: Make this scan the models directory and autoload everything.
