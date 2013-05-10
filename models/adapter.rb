@@ -4,6 +4,15 @@ module Adapter
     attr_accessor :title, :description, :url, :address, :url, :start_time,
       :end_time
 
+    def detailed_description
+      str  = "#{title}\n"
+      str += "#{url}\n\n"
+      str += "#{address}\n\n"
+      str += "#{description}"
+
+      str
+    end
+
     def self.from_meetup(event_id)
       event = Hashie::Mash.new(JSON.parse(::Event.find(event_id).raw))
       adapter = Adapter::Event.new

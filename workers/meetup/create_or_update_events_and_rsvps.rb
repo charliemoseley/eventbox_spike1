@@ -14,6 +14,7 @@ module Worker
         refresh_token = account.refresh_token
         member_id     = account.provider_uid
         user          = account.user
+        calendar_account = user.accounts.select { |a| a.provider == "google_oauth2" }.first
 
         c = Echidna::Connection.new
 
@@ -33,7 +34,7 @@ module Worker
           event_json   = event.to_json
           event_digest = Digest::SHA1.hexdigest(event_json)
 
-          calendar_uid = source_calendar_uid(user, user_info)
+          calendar_uid = source_calendar_uid(calendar_account, user_info)
 
           # START EVENT HANDLING
           local_event = Event.select('id, digest').find_by_provider_and_provider_source_uid \
@@ -54,7 +55,7 @@ module Worker
                 subscribable: local_event,
                 provider: "gcal",
                 provider_source_uid: calendar_uid,
-                account: account,
+                account: calendar_account,
                 last_update: Time.now,
                 event_date: Time.at(event.time/1000)
             end
@@ -90,7 +91,7 @@ module Worker
                 subscribable: local_rsvp,
                 provider: "gcal",
                 provider_source_uid: calendar_uid,
-                account: account,
+                account: calendar_account,
                 last_update: Time.now,
                 event_date: Time.at(event.time/1000)
             end
@@ -110,8 +111,7 @@ module Worker
         end
       end
       
-      def source_calendar_uid(user, user_event_info)
-        account = user.accounts.select { |a| a.provider == "google_oauth2" }.first
+      def source_calendar_uid(account, user_event_info)
         unless user_event_info.rsvp.nil?
           if user_event_info.rsvp == "yes" || user_event_info.rsvp == "waitlist"
             calendar = account.calendars.select { |c| c.purpose == "primary" }.first
