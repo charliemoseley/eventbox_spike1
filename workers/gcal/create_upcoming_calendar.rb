@@ -2,7 +2,7 @@
 # not and appriopately handles the situation.
 
 module Worker
-  module GCal
+  module Gcal
     class CreateUpcomingCalendar
       include Sidekiq::Worker
       

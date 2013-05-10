@@ -1,5 +1,5 @@
 module Worker
-  module GCal
+  module Gcal
     class SubscriptionEvent
       include Sidekiq::Worker
       

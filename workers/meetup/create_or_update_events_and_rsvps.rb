@@ -53,12 +53,16 @@ module Worker
               event_sub = Subscription.create \
                 user: user,
                 subscribable: local_event,
-                target: "gcal",
+                target: "GCal",
                 target_info: { calendar_uid: calendar_uid },
                 account: calendar_account,
                 last_update: Time.now,
                 event_date: Time.at(event.time/1000)
             end
+            
+            # Push changes to pubsub
+            data = { event_id: local_event.id, timestamp: Time.now }
+            $redis.publish "events", data.to_json
           else
           # The event already exists in our system
             # Update the event if anything has changed.
@@ -89,7 +93,7 @@ module Worker
               rsvp_sub = Subscription.create \
                 user: user,
                 subscribable: local_rsvp,
-                target: "gcal",
+                target: "GCal",
                 target_info: { calendar_uid: calendar_uid },
                 account: calendar_account,
                 last_update: Time.now,

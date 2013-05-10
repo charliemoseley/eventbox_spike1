@@ -13,7 +13,7 @@
 #   the calendar_event_id)
 
 module Worker
-  module GCal
+  module Gcal
     class CreateUpcomingCalendar
       include Sidekiq::Worker
 
