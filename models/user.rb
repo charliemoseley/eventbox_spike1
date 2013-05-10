@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   has_many :subscriptions
   has_many :archives
   has_many :events, through: :archives
-  has_many :rsvps,  through: :archives
+  has_many :rsvps
   
   def self.login(omniauth)
     ActiveRecord::Base.transaction do

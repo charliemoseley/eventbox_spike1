@@ -1,10 +1,10 @@
 class CreateEventsAndRsvps < ActiveRecord::Migration
   def change
     create_table :events, id: :uuid do |t|
-      t.string   :provider,           null: false
+      t.string   :provider,            null: false
       t.string   :provider_source_uid, null: false
-      t.text     :raw,                null: false
-      t.string   :digest,             null: false
+      t.text     :raw,                 null: false
+      t.string   :digest,              null: false
       t.datetime :last_update
       
       t.timestamps
@@ -14,11 +14,17 @@ class CreateEventsAndRsvps < ActiveRecord::Migration
     add_index :events, :digest, unique: true
 
     create_table :rsvps, id: :uuid do |t|
+      t.uuid     :user_id,    null: false
+      t.uuid     :event_id,   null: false
       t.string   :status,     null: false
       t.string   :extra
       t.datetime :last_update
 
       t.timestamps
     end
+
+    add_index :events, [:user_id, :event_id], unique: true
+    add_index :rsvps, :user_id
+    add_index :rsvps, :event_id
   end
 end

@@ -1,6 +1,8 @@
 # This worker checks whether or not EventBox's upcoming calendar exists or
 # not and appriopately handles the situation.
 
+# TODO: This whole worker is specific to GCal, we'll need to abstract that later.
+
 module Worker
   module Meetup
     class CreateOrUpdateEventsAndRsvps
@@ -31,8 +33,10 @@ module Worker
           event_json   = event.to_json
           event_digest = Digest::SHA1.hexdigest(event_json)
 
+          calendar_uid = source_calendar_uid(user, user_info)
+
           # START EVENT HANDLING
-          local_event = Event.select('id, digest').find_by_provider_and_provider_source_uid\
+          local_event = Event.select('id, digest').find_by_provider_and_provider_source_uid \
                           "meetup", event.id
           # This is a new event
           if local_event.nil?
@@ -48,8 +52,8 @@ module Worker
               event_sub = Subscription.create \
                 user: user,
                 subscribable: local_event,
-                provider: "meetup",
-                provider_source_uid: local_event.provider_source_uid,
+                provider: "gcal",
+                provider_source_uid: calendar_uid,
                 account: account,
                 last_update: Time.now,
                 event_date: Time.at(event.time/1000)
@@ -71,19 +75,21 @@ module Worker
 
           # START RSVP HANDLING
           rsvp_status = user_info.rsvp.response rescue "unspecified"
-          local_rsvp = Rsvp.find_with_user_and_event(user, event)
+          local_rsvp = Rsvp.find_by_user_id_and_event_id(user.id, local_event.id)
           # This is a new rsvp
           if local_rsvp.nil?
             ActiveRecord::Base.transaction do
               local_rsvp = Rsvp.create \
+                user:   user,
+                event:  local_event,
                 status: rsvp_status,
                 extra:  user_info.to_json
 
               rsvp_sub = Subscription.create \
                 user: user,
                 subscribable: local_rsvp,
-                provider: "meetup",
-                provider_source_uid: local_event.provider_source_uid,
+                provider: "gcal",
+                provider_source_uid: calendar_uid,
                 account: account,
                 last_update: Time.now,
                 event_date: Time.at(event.time/1000)
@@ -102,6 +108,18 @@ module Worker
             end
           end
         end
+      end
+      
+      def source_calendar_uid(user, user_event_info)
+        account = user.accounts.select { |a| a.provider == "google_oauth2" }.first
+        unless user_event_info.rsvp.nil?
+          if user_event_info.rsvp == "yes" || user_event_info.rsvp == "waitlist"
+            calendar = account.calendars.select { |c| c.purpose == "primary" }.first
+            return calendar.provider_calendar_uid
+          end
+        end
+        calendar = account.calendars.select { |c| c.purpose == "upcoming" }.first
+        return calendar.provider_calendar_uid
       end
     end
   end
