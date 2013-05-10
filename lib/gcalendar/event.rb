@@ -110,7 +110,7 @@ module GCalendar
         request_params: camelize_keys(options)
       }
       
-      connection = Echidna::Connection.new
+      connection = GCalendar::Connection.new
       response   = connection.api :get, url, request_options
       return response if response.kind_of? Echidna::Error
       

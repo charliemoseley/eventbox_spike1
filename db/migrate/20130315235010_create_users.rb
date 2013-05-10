@@ -1,6 +1,7 @@
 class CreateUsers < ActiveRecord::Migration
   def up
     enable_extension 'uuid-ossp'
+    enable_extension 'hstore'
 
     create_table :users, id: :uuid do |t|
       t.string :name

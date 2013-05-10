@@ -53,8 +53,8 @@ module Worker
               event_sub = Subscription.create \
                 user: user,
                 subscribable: local_event,
-                provider: "gcal",
-                provider_source_uid: calendar_uid,
+                target: "gcal",
+                target_info: { calendar_uid: calendar_uid },
                 account: calendar_account,
                 last_update: Time.now,
                 event_date: Time.at(event.time/1000)
@@ -89,8 +89,8 @@ module Worker
               rsvp_sub = Subscription.create \
                 user: user,
                 subscribable: local_rsvp,
-                provider: "gcal",
-                provider_source_uid: calendar_uid,
+                target: "gcal",
+                target_info: { calendar_uid: calendar_uid },
                 account: calendar_account,
                 last_update: Time.now,
                 event_date: Time.at(event.time/1000)
