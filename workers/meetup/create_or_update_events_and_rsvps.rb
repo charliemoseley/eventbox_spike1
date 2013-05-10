@@ -68,7 +68,7 @@ module Worker
 
               # Push changes to pubsub
               data = { event_id: local_event.id, timestamp: Time.now }
-              $redis.publish "events", data
+              $redis.publish "events", data.to_json
             end
           end
           # END EVENT HANDLING
@@ -104,7 +104,7 @@ module Worker
 
               # Push changes to pubsub
               data = { rsvp_id: local_rsvp.id, timestamp: Time.now }
-              $redis.publish "events", data
+              $redis.publish "rsvps", data.to_json
             end
           end
         end
