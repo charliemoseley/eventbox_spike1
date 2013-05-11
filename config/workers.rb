@@ -1,6 +1,9 @@
 # Dependancies
 require 'sidekiq'
 require 'redis'
+if ENV['RACK_ENV'] == 'production'
+  require 'newrelic_rpm'
+end
 
 # Load up the libraries
 require_relative '../lib/echidna/echidna'

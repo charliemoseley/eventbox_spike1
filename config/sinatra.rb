@@ -4,6 +4,9 @@ require 'sinatra/activerecord'
 require 'omniauth'
 require 'rack-flash'
 require 'rack/csrf'
+if ENV['RACK_ENV'] == 'production'
+  require 'newrelic_rpm'
+end
 
 # Do any sinatra configuration required
 class EventBoxWeb < Sinatra::Base
