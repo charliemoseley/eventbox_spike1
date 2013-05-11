@@ -12,7 +12,7 @@ ActiveRecord::Base.establish_connection \
   password: db.password,
   database: db.path[1..-1],
   encoding: 'utf8',
-  pool:      25
+  pool:      40
 
 
 # Load up all the models
