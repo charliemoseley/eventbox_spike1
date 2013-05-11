@@ -15,7 +15,12 @@ class PubSubServer
     require 'redis'
     require 'json'
 
-    $redis = Redis.new(:timeout => 0)
+    redis_uri = URI.parse(ENV["REDIS_URL"])
+    $redis = Redis.new \
+      host: redis_uri.host,
+      port: redis_uri.port,
+      password: redis_uri.password,
+      timeout: 0
 
     $redis.subscribe('events', 'rsvps') do |on|
       on.message do |channel, msg|

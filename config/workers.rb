@@ -66,6 +66,14 @@ Echidna::Config.callback_token_refreshed = ->(provider, user_uid, response) do
   account.save
 end
 
+# Setup Sidekiq
+Sidekiq.configure_server do |config|
+  config.redis = { url: ENV["REDIS_URL"], namespace: 'worker' }
+end
+Sidekiq.configure_client do |config|
+  config.redis = { url: ENV["REDIS_URL"], namespace: 'worker' }
+end
+
 # Set the base class with connection
 module Worker
   $redis = Redis.connect
