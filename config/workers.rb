@@ -73,6 +73,19 @@ end
 Sidekiq.configure_client do |config|
   config.redis = { url: ENV["REDIS_URL"], namespace: 'worker' }
 end
+if ENV['RACK_ENV'] == 'production'
+  Sidekiq.configure_client do |config|
+    config.client_middleware do |chain|
+      chain.add Autoscaler::Sidekiq::Client, 'default' => Autoscaler::HerokuScaler.new
+    end
+  end
+
+  Sidekiq.configure_server do |config|
+    config.server_middleware do |chain|
+      chain.add(Autoscaler::Sidekiq::Server, Autoscaler::HerokuScaler.new, 60)
+    end
+  end
+end
 
 # Set the base class with connection
 module Worker

@@ -38,6 +38,7 @@ gem 'hashie'
 
 group :production do
   gem 'newrelic_rpm'
+  gem 'autoscaler'
 end
 
 # Development Tools

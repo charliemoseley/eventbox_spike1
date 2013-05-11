@@ -4,6 +4,7 @@
 .idea/*
 .ruby-version
 .rbx
+/html_views
 
 
 # https://github.com/github/gitignore/blob/master/Global/OSX.gitignore
