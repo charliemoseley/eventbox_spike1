@@ -19,8 +19,8 @@ class PubSubServer
     $redis = Redis.new \
       host: redis_uri.host,
       port: redis_uri.port,
-      password: redis_uri.password,
-      timeout: 0
+      password: redis_uri.password#,
+      #timeout: 0
 
     $redis.subscribe('events', 'rsvps') do |on|
       on.message do |channel, msg|
