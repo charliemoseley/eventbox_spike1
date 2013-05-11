@@ -10,19 +10,32 @@
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
 
-  <link href='//fonts.googleapis.com/css?family=Noto+Sans' rel='stylesheet' type='text/css'>
+  <link href='//fonts.googleapis.com/css?family=Didact+Gothic' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" type="text/css" href="/assets/application.css">
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 </head>
 
-<body id="<%= current_path %>">
-  <div class="container row">
-    <div id="flash-container" class="fixed-container">
-      <% flash.keys.each do | key | %>
-        <div class="alert alert-<%= key %>"><%= flash[key] %></div>
-      <% end %>
+<body id="public" class="<%= current_path %>">
+
+<div class="container">
+  <div class="row">
+    <div class="title span12">
+      <h1 class="letter-press">eventbox.io</h1>
+      <h3 class="letter-press">The (soon to be) best way manage your social events.</h3>
     </div>
   </div>
+
+  <% unless flash.keys.empty? %>
+    <div class="row">
+      <div class="row">
+        <div id="flash-container" class="fixed-container">
+          <% flash.keys.each do | key | %>
+            <div class="alert alert-<%= key %>"><%= flash[key] %></div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
   
   <%= yield %>
   

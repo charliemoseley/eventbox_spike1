@@ -4,28 +4,18 @@ require_relative 'config/sinatra'
 
 class EventBoxWeb < Sinatra::Base  
   get '/' do
-    erb :'pages/index', layout: :'layout_homepage'
+    erb :'pages/index', layout: :'layout_public'
   end
 
   get '/login' do
-    erb :'pages/login', layout: :'layout_homepage'
+    erb :'pages/login', layout: :'layout_public'
   end
-  
-  post '/wait-list' do
-    flash[:notice] = "Thanks for signing up!"
-    redirect '/'
-  end
-  
+
   get '/dashboard' do
     protected_page
-    erb :'pages/dashboard'
+    erb :'pages/dashboard', layou: :'layout_dashboard'
   end
-  
-  # Test Routes
-  get '/message' do
-    Worker::Message::Test.perform_async("Hi Sidekiq")
-  end
-  
+
   # Authentication Routes
   get '/auth/google_oauth2/callback' do
     user = User.login request.env["omniauth.auth"]

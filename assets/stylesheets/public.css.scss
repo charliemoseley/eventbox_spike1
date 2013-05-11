@@ -1,0 +1,31 @@
+#public {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  background-image: asset-url("public_bg.png");
+
+  h1 { font-size: 80px; margin-bottom: 20px; margin-top: 60px; }
+  h3 { font-size: 20px; }
+
+  .title {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .letter-press {
+    font-family: 'Didact Gothic', sans-serif;
+    color: #222;
+    text-shadow: 0px 2px 3px #555;
+  }
+
+  .row { margin-bottom: 20px; }
+
+  .content-block {
+    background: #222;
+    padding: 20px;
+    color: #999; 
+    -webkit-box-shadow: 0px 2px 3px #555;
+    -moz-box-shadow: 0px 2px 3px #555;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+  }
+}
