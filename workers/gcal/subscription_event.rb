@@ -2,6 +2,7 @@ module Worker
   module Gcal
     class SubscriptionEvent
       include Sidekiq::Worker
+      sidekiq_options backtrace: true, retry: 3
       
       def perform(subscription_id, queued_time)
         subscription = Subscription.find subscription_id

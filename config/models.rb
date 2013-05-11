@@ -11,8 +11,9 @@ ActiveRecord::Base.establish_connection \
   username: db.user,
   password: db.password,
   database: db.path[1..-1],
-  encoding: 'utf8'
-ActiveRecord::Base.connection_pool.instance_variable_set('@size', 40)
+  encoding: 'utf8',
+  pool:     20,
+  reaping_frequency: 10
 
 # Load up all the models
 # TODO: Make this scan the models directory and autoload everything.

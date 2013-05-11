@@ -27,6 +27,7 @@ gem 'sass', '~> 3.3.0.alpha.134'
 
 # Workers
 gem 'sidekiq'
+gem 'sidekiq-failures'
 gem 'slim', '~> 1.3.8'
 gem 'nokogiri'
 
