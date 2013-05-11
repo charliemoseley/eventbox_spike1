@@ -33,8 +33,8 @@ class EventBoxWeb < Sinatra::Base
     redirect '/error' if user.nil?
     
     # Shoot of the worker to check/create our calendar on login
-    account = user.accounts.select{ |a| a.provider = "google_oauth2" }.first
-    Worker::GCal::CreateUpcomingCalendar.perform_async(account.id)
+    account = user.accounts.select{ |a| a.provider == "google_oauth2" }.first
+    Worker::Gcal::CreateUpcomingCalendar.perform_async(account.id)
 
     session[:user_id] = user.id
     redirect '/dashboard'

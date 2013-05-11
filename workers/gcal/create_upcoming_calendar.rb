@@ -11,62 +11,54 @@ module Worker
         account = CalendarAccount.new(account)
 
         ########################################################################
-        # Case: No calendars in our internal record
+        # Case: No calendars in our internal record so we make them.
         ########################################################################
         unless account.has_calendars?
           # Create a new internal record for the primary calendar if we don't have it.
           if account.primary_calendar.nil?
-            ex_primary_calendar = find_external_primary_calendar account
-            in_primary_calendar = create_internal_calendar account,
-                                    ex_primary_calendar, "primary"
+            primary_gcal      = create_google_calendar account, :primary
+            primary_local_cal = creater_local_calendar account, :primary, primary_gcal
           end
 
           # Create a new internal record for the upcoming calendar if we don't have it.
           if account.upcoming_calendar.nil?
-            ex_primary_calendar = create_upcoming_calendar account
-            in_primary_calendar = create_internal_calendar account,
-                                    ex_primary_calendar, "upcoming"
+            upcoming_gcal      = create_google_calendar account, :upcoming
+            upcoming_local_cal = creater_local_calendar account, :upcoming, upcoming_gcal
           end
-
-          return true
+          return true # We're done, exit out
         end
 
         ########################################################################
-        # Case: Calendars where found in our internal record
+        # Case: Calendars where found in our internal record, so lets just check
+        # that there still there and recreate them if not.
         ########################################################################
-        in_primary_calendar  = account.primary_calendar
-        in_upcoming_calendar = account.upcoming_calendar
-        ex_primary_calendar  = find_external_calendar \
-                                 account, 
-                                 in_primary_calendar.provider_calendar_uid
-        ex_upcoming_calendar = find_external_calendar \
-                                 account, 
-                                 in_upcoming_calendar.provider_calendar_uid
+        primary_local_cal  = account.primary_calendar
+        upcoming_local_cal = account.upcoming_calendar
 
-        ########################################################################
-        # Case: Calendars where found in our internal record
-        ########################################################################
+        primary_gcal  = find_google_calendar account, primary_local_cal.provider_calendar_uid
+        upcoming_gcal = find_google_calendar account, upcoming_local_cal.provider_calendar_uid
 
-        # TODO: Their primary calendar is gone; we're fucked.
-
-        # The upcoming calendar is missing
-        if ex_upcoming_calendar.kind_of? Echidna::Error
-          if ex_upcoming_calendar.body.error.code == 404
-            # The calendar just couldn't be found, so let's recreate it.
-            ex_upcoming_calendar = create_upcoming_calendar account
-            update_internal_calendar \
-              in_upcoming_calendar.id,
-              account, 
-              ex_upcoming_calendar,
-              "upcoming"
-            return true
+        if primary_gcal.kind_of? Echidna::Error
+          if primary_gcal.body.error.code == 404
+            primary_gcal      = create_google_calendar account, :primary
+            primary_local_cal = update_local_calendar  account, :primary, primary_gcal, primary_local_cal
           else
-            #  Raise an error so Sidekiq can try again later
-            raise external_calendar
+            # Raise an error so Sidekiq can try again later
+            raise primary_gcal
           end
         end
 
-        # If it wasn't an error, then we know everything is good.  The user is
+        if upcoming_gcal.kind_of? Echidna::Error
+          if upcoming_gcal.body.error.code == 404
+            upcoming_gcal      = create_google_calendar account, :upcoming
+            upcoming_local_cal = update_local_calendar  account, :upcoming, upcoming_gcal, upcoming_local_cal
+          else
+            # Raise an error so Sidekiq can try again later
+            raise upcoming_gcal
+          end
+        end
+
+        # FUTURE: If it wasn't an error, then we know everything is good.  The user is
         # allowed to customize the calendar as they see fit, we just update the
         # values of our internal version to know any changes they made in case
         # we need to recreate it.
@@ -75,55 +67,51 @@ module Worker
         # EXCESSIVE QUERIES
       end
 
-      def find_external_primary_calendar(account)
-        calendar = GCalendar::Calendar.primary_calendar \
-                     access_token:  account.token,
-                     refresh_token: account.refresh_token,
-                     user_uid:      account.provider_uid
-      end
 
-      def create_upcoming_calendar(account)
-        calendar = GCalendar::Calendar.new \
-                     access_token:  account.token,
-                     refresh_token: account.refresh_token,
-                     user_uid:      account.provider_uid
-        calendar.summary = "Upcoming Events (EventBox.io)"
-        calendar.save
+      private
 
-        calendar
-      end
-
-      def find_external_calendar(account, calendar_id)
+      def find_google_calendar(account, calendar_id)
         GCalendar::Calendar.find calendar_id,
                                  access_token:  account.token,
                                  refresh_token: account.refresh_token,
                                  user_uid:      account.provider_uid
       end
 
-      def create_internal_calendar(account, external_calendar, purpose)
-        internal_calendar                       = Calendar.new
-        internal_calendar.account               = account.to_account
-        internal_calendar.provider              = "google"
-        internal_calendar.provider_calendar_uid = external_calendar.id
-        internal_calendar.purpose               = purpose
-        internal_calendar.etag                  = external_calendar.etag
-        internal_calendar.raw                   = external_calendar.to_json
-        internal_calendar.save
+      def create_google_calendar(account, purpose)
+        purpose = purpose.to_sym
+        title = "Attending Events (Eventbox.io)" if purpose == :primary
+        title = "Upcoming Events (Eventbox.io)"  if purpose == :upcoming
+        raise "purpose needs to be either :primary or :upcoming" unless defined?(title)
 
-        internal_calendar
+        calendar = GCalendar::Calendar.new \
+                     access_token:  account.token,
+                     refresh_token: account.refresh_token,
+                     user_uid:      account.provider_uid
+        calendar.summary = title
+        calendar.save
+
+        calendar
       end
 
-      def update_internal_calendar(calendar_id, account, external_calendar, purpose)
-        internal_calendar = Calendar.find(calendar_id)
-        internal_calendar.account               = account.to_account
-        internal_calendar.provider              = "google"
-        internal_calendar.provider_calendar_uid = external_calendar.id
-        internal_calendar.purpose               = purpose
-        internal_calendar.etag                  = external_calendar.etag
-        internal_calendar.raw                   = external_calendar.to_json
-        internal_calendar.save
+      def creater_local_calendar(account, purpose, google_calendar)
+        local_calendar = Calendar.new
+        local_calendar_save(account, purpose, google_calendar, local_calendar)
+      end
 
-        internal_calendar
+      def update_local_calendar(account, purpose, google_calendar, local_calendar)
+        local_calendar_save(account, purpose, google_calendar, local_calendar)
+      end
+
+      def local_calendar_save(account, purpose, google_calendar, local_calendar)
+        local_calendar.account               = account.to_account
+        local_calendar.provider              = "google"
+        local_calendar.provider_calendar_uid = google_calendar.id
+        local_calendar.purpose               = purpose.to_s
+        local_calendar.etag                  = google_calendar.etag
+        local_calendar.raw                   = google_calendar.to_json
+        local_calendar.save
+
+        local_calendar
       end
     end
   end
