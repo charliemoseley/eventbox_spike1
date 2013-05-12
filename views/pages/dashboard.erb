@@ -1,18 +1,21 @@
-Welcome <%= current_user.name %>!<br />
-<a class="btn btn-success" href="/auth/meetup">
-  <i class="icon-google-plus-sign icon-large"></i> 
-  Login with Meetup
-</a>
-<hr />
-<table>
-  <tr>
-    <td>Provider</td>
-    <td>UID</td>
-  </tr>
-  <% current_user.accounts.each do |account| %>
+<div class="add-accounts">
+  <a class="btn btn-success" type="button">Add Meetup Account</a>
+</div>
+<table class="table">
+  <thead>
     <tr>
+      <th>#</th>
+      <th>Provider</th>
+      <th>UID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% current_user.accounts.each_with_index do |account, index| %>
+    <tr>
+      <td><%= index %></td>
       <td><%= account.provider %></td>
       <td><%= account.provider_uid %></td>
     </tr>
-  <% end %>
+    <% end %>
+  </tbody>
 </table>

@@ -14,7 +14,6 @@ require_relative 'models'
 
 # Load up the workers
 # TODO: Make this scan the models directory and autoload everything.
-require_relative '../workers/message/test'
 require_relative '../workers/gcal/create_upcoming_calendar'
 require_relative '../workers/gcal/subscription_event'
 require_relative '../workers/meetup/create_or_update_events_and_rsvps'

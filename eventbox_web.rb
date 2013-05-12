@@ -13,7 +13,7 @@ class EventBoxWeb < Sinatra::Base
 
   get '/dashboard' do
     protected_page
-    erb :'pages/dashboard', layou: :'layout_dashboard'
+    erb :'pages/dashboard', layout: :'layout_dashboard'
   end
 
   # Authentication Routes

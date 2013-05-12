@@ -15,17 +15,39 @@
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 </head>
 
-<body id="<%= current_path %>">
-  <div class="container row">
-    <div id="flash-container" class="fixed-container">
-      <% flash.keys.each do | key | %>
-        <div class="alert alert-<%= key %>"><%= flash[key] %></div>
-      <% end %>
-    </div>
+<body id="dashboard" class="<%= current_path %>">
+
+<div class="dashboard-container">
+  <div class="app-info">
+    Welcome <%= current_user.name %>! | <a href="/logout">logout</a>
   </div>
-  
-  <%= yield %>
-  
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <nav class="primary-navigation">
+    <h2>eventbox.io</h2>
+    
+    <ul>
+      <li><a href="#" class="active">Accounts</a></li>
+      <!--<li><a href="#">Stats</a></li>-->
+      <li><a href="#">News</a></li>
+      <li><a href="#">Feedback</a></li>
+    </ul>
+  </nav>
+
+  <div class="dashboard-content">
+    <% unless flash.keys.empty? %>
+        <div class="row">
+          <div id="flash-container" class="fixed-container">
+            <% flash.keys.each do | key | %>
+              <div class="alert alert-<%= key %>"><%= flash[key] %></div>
+            <% end %>
+          </div>
+      </div>
+    <% end %>
+    <%= yield %>
+  </div>
+</div>
+<div class="topbar-style"></div>
+<div class="sidebar-style"></div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 </body>
 </html>
