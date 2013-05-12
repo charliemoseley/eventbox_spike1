@@ -1,18 +1,16 @@
 <div class="add-accounts">
-  <a class="btn btn-success" type="button">Add Meetup Account</a>
+  <a class="btn btn-success" type="button" href="/auth/meetup">Add Meetup Account</a>
 </div>
 <table class="table">
   <thead>
     <tr>
-      <th>#</th>
       <th>Provider</th>
       <th>UID</th>
     </tr>
   </thead>
   <tbody>
-    <% current_user.accounts.each_with_index do |account, index| %>
+    <% current_user.accounts.each do |account| %>
     <tr>
-      <td><%= index %></td>
       <td><%= account.provider %></td>
       <td><%= account.provider_uid %></td>
     </tr>

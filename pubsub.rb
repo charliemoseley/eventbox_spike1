@@ -1,35 +1,28 @@
 require 'rubygems'
 require 'bundler'
 Bundler.require
+require 'redis'
+require 'json'
+require 'celluloid'
 require 'dotenv'
 Dotenv.load
-
-require 'celluloid'
 require './config/workers'
 
 class PubSubServer
   include Celluloid
 
   def initialize
-    require 'rubygems'
-    require 'redis'
-    require 'json'
-
     redis_uri = URI.parse(ENV["REDIS_URL"])
     $redis = Redis.new \
       host: redis_uri.host,
       port: redis_uri.port,
-      password: redis_uri.password#,
-      #timeout: 0
+      password: redis_uri.password
 
     $redis.subscribe('events', 'rsvps') do |on|
       on.message do |channel, msg|
-        # data = JSON.parse(msg)
-        # str = "##{channel} - [#{data['user']}]: #{data['msg']} + #{Time.now}"
-        # puts str
-        # Worker::Message::Test.perform_async(str)
-        event_handler(msg) if channel == "events"
-        rsvp_handler(msg)  if channel == "rsvp"
+        event_handler(msg)        if channel == "events"
+        rsvp_handler(msg)         if channel == "rsvp"
+        subscription_handler(msg) if channel == "subscription"
       end
     end
   end
@@ -42,6 +35,11 @@ class PubSubServer
   def rsvp_handler(msg)
     data = JSON.parse(msg)
     RSVP.update_subscribers data['rvsp_id'], data['timestamp']
+  end
+
+  def subscription_handler(msg)
+    data = JSON.parse(msg)
+    Subscription.update_individual data['subscription_id'], data['timestamp']
   end
 end
 PubSubServer.supervise

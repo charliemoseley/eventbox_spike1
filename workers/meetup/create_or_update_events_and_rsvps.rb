@@ -66,6 +66,23 @@ module Worker
             $redis.publish "events", data.to_json
           else
           # The event already exists in our system
+            # No changes, now check if the user has a subscription to this event
+            event_sub = Subscription.find_by_user_id_and_subscribable_type_and_subscribable_id \
+                          user.id, "Event", local_event.id
+            if event_sub.nil?
+              event_sub = Subscription.create \
+                user: user,
+                subscribable: local_event,
+                target: "GCal",
+                target_info: { calendar_uid: calendar_uid },
+                account: calendar_account,
+                last_update: Time.now,
+                event_date: Time.at(event.time/1000)
+
+              data = { subscription_id: event_sub.id, timestamp: Time.now }
+              $redis.publish "subscription", data.to_json
+            end
+
             # Update the event if anything has changed.
             if local_event.digest != event_digest
               local_event.raw    = event_json
