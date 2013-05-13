@@ -1,0 +1,19 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Source</th>
+      <th>Event Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% current_user.events.each do |event| %>
+      <tr>
+        <td><%= event.provider %></td>
+        <td><%= event.title %></td>
+        <td><%= event.description[0...100] %></td>
+        <td><%= event.start_time %></td>
+        <td><%= event.end_time %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

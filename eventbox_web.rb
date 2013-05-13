@@ -16,6 +16,10 @@ class EventBoxWeb < Sinatra::Base
     erb :'pages/dashboard', layout: :'layout_dashboard'
   end
 
+  get '/dashboard/events' do
+    erb :'dashboard/events', layout: :'layout_dashboard'
+  end
+
   # Authentication Routes
   get '/auth/google_oauth2/callback' do
     user = User.login request.env["omniauth.auth"]
