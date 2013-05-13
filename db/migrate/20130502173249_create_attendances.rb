@@ -1,4 +1,4 @@
-class CreateArchives < ActiveRecord::Migration
+class CreateAttendances < ActiveRecord::Migration
   def change
     create_table :attendances, id: :uuid do |t|
       t.uuid :user_id,  null: false
