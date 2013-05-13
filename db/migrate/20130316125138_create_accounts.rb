@@ -11,14 +11,12 @@ class CreateAccounts < ActiveRecord::Migration
       t.string  :image
       t.string  :token,        null: false
       t.string  :refresh_token
-      t.integer :expires_at
-      t.boolean :expires
       t.text    :raw,          null: false
       
       t.timestamps
     end
     
-    add_index :accounts, [:provider, :provider_uid], unique: true
     add_index :accounts, :user_id
+    add_index :accounts, [:provider, :provider_uid], unique: true
   end
 end
