@@ -44,5 +44,5 @@ end
 # Development Tools
 gem 'pry' # Left outside the dev block to make Heroku use this as our console.
 group :development do
-  gem 'shotgun'
+  gem 'thor'
 end

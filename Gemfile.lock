@@ -97,8 +97,6 @@ GEM
     redis-namespace (1.2.1)
       redis (~> 3.0.0)
     sass (3.3.0.alpha.134)
-    shotgun (0.9)
-      rack (>= 1.0)
     sidekiq (2.11.2)
       celluloid (>= 0.13.0)
       connection_pool (>= 1.0.0)
@@ -163,7 +161,6 @@ DEPENDENCIES
   rake
   redis
   sass (~> 3.3.0.alpha.134)
-  shotgun
   sidekiq
   sidekiq-failures
   sinatra
@@ -172,4 +169,5 @@ DEPENDENCIES
   sprockets
   sprockets-helpers
   sprockets-sass
+  thor
   typhoeus
