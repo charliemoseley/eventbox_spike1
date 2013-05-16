@@ -36,8 +36,8 @@ module Worker
         primary_local_cal  = account.primary_calendar
         upcoming_local_cal = account.upcoming_calendar
 
-        primary_gcal  = find_google_calendar account, primary_local_cal.provider_calendar_uid
-        upcoming_gcal = find_google_calendar account, upcoming_local_cal.provider_calendar_uid
+        primary_gcal  = find_google_calendar account, primary_local_cal.external_uid
+        upcoming_gcal = find_google_calendar account, upcoming_local_cal.external_uid
 
         if primary_gcal.kind_of? Echidna::Error
           if primary_gcal.body.error.code == 404
@@ -106,7 +106,7 @@ module Worker
       def local_calendar_save(account, purpose, google_calendar, local_calendar)
         local_calendar.account               = account.to_account
         local_calendar.provider              = "google"
-        local_calendar.provider_calendar_uid = google_calendar.id
+        local_calendar.external_uid = google_calendar.id
         local_calendar.purpose               = purpose.to_s
         local_calendar.etag                  = google_calendar.etag
         local_calendar.raw                   = google_calendar.to_json

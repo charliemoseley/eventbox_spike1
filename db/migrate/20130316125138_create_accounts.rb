@@ -12,6 +12,7 @@ class CreateAccounts < ActiveRecord::Migration
       t.string  :token,        null: false
       t.string  :refresh_token
       t.text    :raw,          null: false
+      t.boolean :active,       null: false, default: :true
       
       t.timestamps
     end

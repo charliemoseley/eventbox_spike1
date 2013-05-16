@@ -15,8 +15,6 @@ class Account < ActiveRecord::Base
     account.image         = omniauth.info.image         rescue nil
     account.token         = omniauth.credentials.token
     account.refresh_token = omniauth.credentials.refresh_token rescue nil
-    account.expires_at    = omniauth.credentials.expires_at    rescue nil
-    account.expires       = omniauth.credentials.expires       rescue nil
     account.raw           = omniauth.to_json
     account.save
     

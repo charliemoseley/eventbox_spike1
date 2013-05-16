@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
   has_many :accounts
   has_many :subscriptions
   has_many :archives
-  has_many :events, through: :archives
+  has_many :events, through: :subscriptions, source: :subscribable, source_type: "Event"
   has_many :rsvps
   
   def self.login(omniauth)

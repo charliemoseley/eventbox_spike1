@@ -8,7 +8,7 @@ module Worker
         subscription = Subscription.find subscription_id
         event        = subscription.subscribable
         account      = subscription.account
-        calendar     = Calendar.find_by_provider_calendar_uid subscription.target_info["calendar_uid"]
+        calendar     = Calendar.find_by_external_uid subscription.target_info["calendar_uid"]
         puts "*" * 88
         puts event.inspect
         puts "*" * 88
@@ -19,10 +19,10 @@ module Worker
                          user_uid:      account.provider_uid,
                          access_token:  account.token,
                          refresh_token: account.refresh_token
-          gcal_event.calendar_id = calendar.provider_calendar_uid
+          gcal_event.calendar_id = calendar.external_uid
         else
           gcal_event = GCalendar::Event.find \
-                         calendar.provider_calendar_uid,
+                         calendar.external_uid,
                          subscription.target_info["event_uid"],
                          user_uid:      account.provider_uid,
                          access_token:  account.token,

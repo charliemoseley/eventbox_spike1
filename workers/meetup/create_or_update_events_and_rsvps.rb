@@ -137,11 +137,11 @@ module Worker
         unless user_event_info.rsvp.response.nil?
           if user_event_info.rsvp.response == "yes" || user_event_info.rsvp.response == "waitlist"
             calendar = account.calendars.select { |c| c.purpose == "primary" }.first
-            return calendar.provider_calendar_uid
+            return calendar.external_uid
           end
         end rescue nil
         calendar = account.calendars.select { |c| c.purpose == "upcoming" }.first
-        return calendar.provider_calendar_uid
+        return calendar.external_uid
       end
     end
   end
