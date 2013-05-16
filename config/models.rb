@@ -24,7 +24,7 @@ require_relative '../models/calendar'
 require_relative '../models/event'
 require_relative '../models/rsvp'
 require_relative '../models/subscription'
-require_relative '../models/archive'
+require_relative '../models/attendance'
 
 # Non AR moderls
 require_relative '../models/adapter'
