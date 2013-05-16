@@ -28,3 +28,6 @@ require_relative '../models/attendance'
 
 # Non AR moderls
 require_relative '../models/adapter'
+
+# Event adapter
+require_relative '../lib/event_adapter/input/meetup'

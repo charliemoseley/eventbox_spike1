@@ -1,4 +1,5 @@
-module EventAdapter::Input
+module EventAdapter
+  module Input
   module Meetup
     HOUR = 3600
 
@@ -12,7 +13,7 @@ module EventAdapter::Input
       event.title        = self.format_title(source, event)
       event.address      = self.format_address(source)
       event.url          = source.event_url
-      event.start_time   = Time.at(event.time/1000)
+      event.start_time   = Time.at(source.time/1000)
       event.end_time     = self.format_end_time(source)
       event.raw          = source_json
       event.digest       = Digest::SHA1.hexdigest(source_json)
@@ -34,7 +35,7 @@ module EventAdapter::Input
       desc += "#{description}\n\n"
       desc += "Event Status: #{event.status.capitalize}\n"
       desc += "Attending: #{source.yes_rsvp_count}"
-      desc += " | Max: #{source.rsvp_rules.guest_limit}" unless source.rsvp_rules.guest_limit.nil?
+      desc += " | Max: #{source.rsvp_rules.guest_limit}" rescue desc
     end
 
     def self.format_address(source)
@@ -52,15 +53,16 @@ module EventAdapter::Input
     end
 
     def self.format_status(source)
-      return "closed"   if source.rsvp_rules.closed == 1
-      return "waitlist" if source.rsvp_rules.guest_limit >= source.yes_rsvp_count rescue next
+      return "closed"   if source.rsvp_rules.closed == 1 rescue nil
+      return "waitlist" if source.rsvp_rules.guest_limit >= source.yes_rsvp_count rescue nil
       return "open"
     end
 
     def self.format_end_time(source)
-      return Time.at((event.time + event.duration)/1000) if event.duration?
+      return Time.at((source.time + source.duration)/1000) if source.duration?
       # If no duration is set, meetup suggest we assume three hours.
-      return start_time + (HOUR * 3)
+      return source.time + (HOUR * 3)
     end
+  end
   end
 end
