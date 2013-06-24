@@ -32,34 +32,38 @@ module Worker
         e.body.results.each do |event|
           user_info = event.delete(:self)
           
-          event_json   = event.to_json
-          event_digest = Digest::SHA1.hexdigest(event_json)
-
-          calendar_uid = source_calendar_uid(calendar_account, user_info)
-
           # START EVENT HANDLING
           local_event = Event.select('id, digest').find_by_provider_and_provider_source_uid \
                           "meetup", event.id
-          # This is a new event
-          if local_event.nil?
-            ActiveRecord::Base.transaction do
-              # Create the event and subscription
-              local_event = Event.create \
-                provider: "meetup",
-                provider_source_uid: event.id,
-                raw: event_json,
-                digest: event_digest
+          
+          event_digest  = EventAdapter::Input::Meetup.get_digest(local_event)
+          event_changed = false
+          if local_event.nil? 
+            # New Event
+            local_event = EventAdapter::Input::Meetup.import event
+            local_event.save
+            event_changed = true
+          elsif local_event.digest != event_digest
+            # Event has changed
+            local_event = EventAdapter::Input::Meetup.import event, local_event
+            local_event.save
+            event_changed = true
+          end
 
-              # Meetup stores their dates as milliseconds from epoch
-              event_sub = Subscription.create \
-                user: user,
-                subscribable: local_event,
-                target: "GCal",
-                target_info: { calendar_uid: calendar_uid },
-                account: calendar_account,
-                last_update: Time.now,
-                event_date: Time.at(event.time/1000)
-            end
+          subscription = 
+
+            # calendar_uid = source_calendar_uid(calendar_account, user_info)
+          end
+              # # Meetup stores their dates as milliseconds from epoch
+              # event_sub = Subscription.create \
+              #   user: user,
+              #   subscribable: local_event,
+              #   target: "GCal",
+              #   target_info: { calendar_uid: calendar_uid },
+              #   account: calendar_account,
+              #   last_update: Time.now,
+              #   event_date: Time.at(event.time/1000)
+            #end
             
             # Push changes to pubsub
             data = { event_id: local_event.id, timestamp: Time.now }

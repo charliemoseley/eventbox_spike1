@@ -3,10 +3,10 @@ module EventAdapter
   module Meetup
     HOUR = 3600
 
-    def self.import(source) # Should be a type of Meetup Event Hashie
+    def self.import(source, event = nil) # Should be a type of Meetup Event Hashie
       source_json = source.to_json
 
-      event = Event.new
+      event = event.nil? ? Event.new : event
       event.provider     = "meetup"
       event.external_uid = source.id
       event.status       = self.format_status(source)
@@ -62,6 +62,10 @@ module EventAdapter
       return Time.at((source.time + source.duration)/1000) if source.duration?
       # If no duration is set, meetup suggest we assume three hours.
       return source.time + (HOUR * 3)
+    end
+
+    def self.get_digest(source)
+      Digest::SHA1.hexdigest(source.to_json)
     end
   end
   end
